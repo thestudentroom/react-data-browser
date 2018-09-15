@@ -69,9 +69,9 @@
     "react-testing-library": "^5.0.1"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-0",
+    "hoist-non-react-statics": "^3.0.0",
     "prop-types": "^15.6.0",
-    "hoist-non-react-statics": "^3.0.0"
+    "react": "^15.3.0 || ^16.0.0-0"
   },
   "files": [
     "dist"
