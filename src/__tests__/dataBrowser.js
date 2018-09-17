@@ -124,17 +124,96 @@ test('offsetColumns objects should contain prop visible', () => {
   expect(result).toEqual(false);
 });
 
-test('onSelection', () => {});
-test('onDeselectAll', () => {});
-test('onSelectAll', () => {});
-test('checkboxToggle', () => {});
-test('checkboxState', () => {});
+test('checkboxToggle select when unchecked', () => {
+  const handleStateChange = jest.fn();
+  const { checkboxToggle } = setup({
+    initialChecked: [0, 1, 2, 3, 4],
+    totalItems: 6,
+    onStateChange: handleStateChange,
+  });
+  checkboxToggle({ rowId: 5 });
+  const changes = {
+    type: DataBrowser.stateChangeTypes.checkboxToggle,
+    checked: [0, 1, 2, 3, 4, 5],
+  };
+  expect(handleStateChange).toHaveBeenCalledTimes(1);
+  expect(handleStateChange).toHaveBeenLastCalledWith(
+    changes,
+    expect.objectContaining({ checked: [0, 1, 2, 3, 4, 5] }),
+  );
+});
+
+test('checkboxToggle select when checked', () => {
+  const handleStateChange = jest.fn();
+  const { checkboxToggle } = setup({
+    initialChecked: [0, 1, 2, 3, 4, 5],
+    totalItems: 6,
+    onStateChange: handleStateChange,
+  });
+  checkboxToggle({ rowId: 5 });
+  const changes = {
+    type: DataBrowser.stateChangeTypes.checkboxToggle,
+    selectAllCheckboxState: false,
+    checked: [0, 1, 2, 3, 4],
+  };
+  expect(handleStateChange).toHaveBeenCalledTimes(1);
+  expect(handleStateChange).toHaveBeenLastCalledWith(
+    changes,
+    expect.objectContaining({ checked: changes.checked }),
+  );
+});
+
+test('onSelection selectAllCheckboxState toggle', () => {
+  const handleStateChange = jest.fn();
+  const { onSelection } = setup({
+    totalItems: 6,
+    onStateChange: handleStateChange,
+  });
+  onSelection({ items: [0, 1, 2, 3, 4, 5] });
+  const changes = {
+    type: DataBrowser.stateChangeTypes.selectAll,
+    selectAllCheckboxState: true,
+    checked: [0, 1, 2, 3, 4, 5],
+  };
+  expect(handleStateChange).toHaveBeenLastCalledWith(
+    changes,
+    expect.objectContaining({ checked: changes.checked }),
+  );
+  onSelection();
+  const changes2 = {
+    type: DataBrowser.stateChangeTypes.deselectAll,
+    selectAllCheckboxState: false,
+    checked: [],
+  };
+  expect(handleStateChange).toHaveBeenCalledTimes(2);
+  expect(handleStateChange).toHaveBeenLastCalledWith(
+    changes2,
+    expect.objectContaining({ checked: [] }),
+  );
+});
+
+test('changeSortDirection', () => {
+  const handleStateChange = jest.fn();
+  const { changeSortDirection } = setup({
+    onStateChange: handleStateChange,
+  });
+  changeSortDirection({ sortDirection: 'dsc' });
+  const changes = {
+    type: DataBrowser.stateChangeTypes.changeSortDirection,
+    currentSort: {
+      sortDirection: 'dsc',
+    },
+  };
+  expect(handleStateChange).toHaveBeenCalledTimes(1);
+  expect(handleStateChange).toHaveBeenLastCalledWith(
+    changes,
+    expect.objectContaining({ currentSort: changes.currentSort }),
+  );
+});
+
 test('defaultSortMethod', () => {});
-test('changeSortDirection', () => {});
-test('toggleSortDirection', () => {});
 test('sortData', () => {});
 test('activeSort', () => {});
-test('_columnFlexInitializer', () => {});
 
 function setup({
   render: renderFn = () => <div />,

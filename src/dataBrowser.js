@@ -9,6 +9,7 @@ const DataBrowserContext = React.createContext({
   columns: [],
   visibleColumns: [],
   viewType: '',
+  viewsAvailable: false,
   selectAllCheckboxState: false,
   currentSort: {},
   checked: [],
@@ -21,6 +22,7 @@ const DataBrowserContext = React.createContext({
   changeSortDirection: () => {},
   defaultSortMethod: () => {},
   sortData: () => {},
+  activeSort: () => {},
   replaceColumnFlex: () => {},
 });
 
@@ -47,8 +49,14 @@ export class DataBrowser extends React.Component {
   static defaultProps = {
     stateReducer: (state, changes) => changes,
     onStateChange: () => {},
+    onSwitchColumns: () => {},
+    onSwitchViewType: () => {},
+    onChangeSortDirection: () => {},
+    onSortData: () => {},
+    onReplaceColumnFlex: () => {},
     viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
     initialColumnFlex: ['0 0 25%', '1 1 35%', '0 0 20%', '0 0 20%'],
+    initialChecked: [],
     totalItems: 0,
   };
   static stateChangeTypes = {
@@ -60,13 +68,19 @@ export class DataBrowser extends React.Component {
     sortData: '__sort_data__',
     onItemClick: '__on_item_select__',
     replaceColumnFlex: '__replace_column_flex__',
+    changeSortDirection: '__change_sort_directon__',
   };
   static Consumer = DataBrowserContext.Consumer;
+  _columnFlexInitializer = () => {
+    return arrayHasArrays(this.props.initialColumnFlex)
+      ? this.props.initialColumnFlex[0]
+      : this.props.initialColumnFlex;
+  };
   switchColumns = ({
     type = DataBrowser.stateChangeTypes.switchColumns,
     from,
     to,
-  }) => {
+  } = {}) => {
     const { visibleColumns: columns, offsetColumns } = this.getState();
     const index = columns.findIndex(x => x.sortField === from);
     const visibleColumns = columns.filter(col => col.sortField !== from);
@@ -74,29 +88,38 @@ export class DataBrowser extends React.Component {
       ({ sortField }) => sortField === to,
     );
     visibleColumns.splice(index, 0, replacement);
-    this.internalSetState({ type, visibleColumns });
+    this.internalSetState({ type, visibleColumns }, () =>
+      this.props.onSwitchColumns(this.getState().visibleColumns),
+    );
   };
   replaceColumnFlex = ({
     type = DataBrowser.stateChangeTypes.replaceColumnFlex,
     columnFlex,
-  }) => {
-    this.internalSetState(state => {
-      const visibleSortFields = state.visibleColumns
-        .map(({ sortField }) => sortField)
-        .reverse();
-      return {
-        type,
-        columnFlex,
-        visibleColumns: this.props.columns
-          .sort((a, b) => {
-            return (
-              visibleSortFields.indexOf(b.sortField) -
-              visibleSortFields.indexOf(a.sortField)
-            );
-          })
-          .slice(0, columnFlex.length),
-      };
-    });
+  } = {}) => {
+    this.internalSetState(
+      state => {
+        const visibleSortFields = state.visibleColumns
+          .map(({ sortField }) => sortField)
+          .reverse();
+        return {
+          type,
+          columnFlex,
+          visibleColumns: this.props.columns
+            .sort((a, b) => {
+              return (
+                visibleSortFields.indexOf(b.sortField) -
+                visibleSortFields.indexOf(a.sortField)
+              );
+            })
+            .slice(0, columnFlex.length),
+        };
+      },
+      () =>
+        this.props.onReplaceColumnFlex({
+          columnFlex: this.getState().columnFlex,
+          visibleColumns: this.getState().visibleColumns,
+        }),
+    );
   };
   offsetColumns = () => {
     const visible = this.getState().visibleColumns.map(
@@ -112,7 +135,7 @@ export class DataBrowser extends React.Component {
         }
       });
   };
-  onSelection = ({ type, items }) => {
+  onSelection = ({ type, items } = {}) => {
     switch (this.getState().selectAllCheckboxState) {
       case true:
         return this.onDeselectAll({ type });
@@ -166,9 +189,11 @@ export class DataBrowser extends React.Component {
   switchViewType = ({
     type = DataBrowser.stateChangeTypes.switchView,
     viewType,
-  }) => {
+  } = {}) => {
     if (this.state.viewsAvailable.includes(viewType)) {
-      this.internalSetState({ type, viewType });
+      this.internalSetState({ type, viewType }, () =>
+        this.props.onSwitchViewType(this.getState().viewType),
+      );
     } else {
       console.warn(`${viewType} not in available views`);
     }
@@ -206,37 +231,43 @@ export class DataBrowser extends React.Component {
       return 0;
     }
   };
-  changeSortDirection = ({ sortDirection = 'asc' }) => {
-    this.internalSetState({ currentSort: { sortDirection } });
+  changeSortDirection = ({
+    type = DataBrowser.stateChangeTypes.changeSortDirection,
+    sortDirection = 'asc',
+  } = {}) => {
+    this.internalSetState({ type, currentSort: { sortDirection } }, () =>
+      this.props.onChangeSortDirection(this.getState().currentSort),
+    );
   };
   toggleSortDirection = () => {
-    this.internalSetState(({ currentSort }) => ({
-      currentSort: {
-        sortDirection: currentSort.sortDirection === 'asc' ? 'dsc' : 'asc',
-        sortField: currentSort.sortField,
-      },
-    }));
+    this.internalSetState(
+      ({ currentSort }) => ({
+        currentSort: {
+          sortDirection: currentSort.sortDirection === 'asc' ? 'dsc' : 'asc',
+          sortField: currentSort.sortField,
+        },
+      }),
+      () => this.props.onToggleSortDirection(this.getState().currentSort),
+    );
   };
   sortData = ({
     type = DataBrowser.stateChangeTypes.sortData,
     sortField = 'id',
     sortDirection = 'asc',
-  }) => {
-    this.internalSetState({
-      type,
-      currentSort: { sortField, sortDirection },
-    });
+  } = {}) => {
+    this.internalSetState(
+      {
+        type,
+        currentSort: { sortField, sortDirection },
+      },
+      () => this.props.onSortData(this.getState().currentSort),
+    );
   };
   activeSort = (fieldName = '', sortDir = '') => {
     const currentSort = this.getState().currentSort;
     const isActive = currentSort.sortField === fieldName;
     const isCurrentSortDir = currentSort.sortDirection === sortDir;
     return isActive && isCurrentSortDir;
-  };
-  _columnFlexInitializer = () => {
-    return arrayHasArrays(this.props.initialColumnFlex)
-      ? this.props.initialColumnFlex[0]
-      : this.props.initialColumnFlex;
   };
   initialState = {
     columnFlex: this._columnFlexInitializer(),
@@ -255,7 +286,7 @@ export class DataBrowser extends React.Component {
       sortDirection: '',
       sortField: '',
     },
-    checked: [],
+    checked: this.props.initialChecked,
     //
     switchViewType: this.switchViewType,
     switchColumns: this.switchColumns,
