@@ -4,8 +4,25 @@ import { FlexCol, FlexRow } from '../globals';
 export const Table = styled(FlexCol)`
   position: relative;
   overflow: none;
+  width: 100vw;
   height: 100%;
-  width: 100%;
+`;
+
+export const TableHead = styled(FlexRow)`
+  flex: 0 0 auto;
+  height: 46px;
+  color: black;
+  border-bottom: 1px solid #ccc;
+  padding: 0 5px;
+  font-size: 12px;
+`;
+
+export const HeadRowItem = styled(FlexRow)`
+  flex: ${({ flex }) => flex};
+  text-transform: uppercase;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
 `;
 
 export const TableBody = styled(FlexCol)`
@@ -14,35 +31,16 @@ export const TableBody = styled(FlexCol)`
   padding: 0 5px;
 `;
 
-export const FixedTableHead = styled(FlexRow)`
+export const TableRow = styled(FlexRow)`
   flex: 0 0 auto;
-  height: auto;
-  background: white;
-  color: ${({ theme }) => theme.text.alt};
-  border-bottom: 1px solid ${({ theme }) => theme.bg.border};
-  padding: 0 5px;
-  font-size: 12px;
-`;
-
-export const HeadRowItem = styled.div`
-  display: flex;
-  text-transform: uppercase;
-  height: 46px;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 10px;
-`;
-
-export const Row = styled(FlexRow)`
-  flex: 0 0 auto;
-  border-bottom: 1px solid ${({ theme }) => theme.bg.wash};
+  border-bottom: 1px solid #eee;
   &:hover {
     background: ${({ selectable }) => selectable && '#4286f4'};
     color: white;
   }
 `;
 
-export const RowItem = styled.div`
+export const TableRowItem = styled.div`
   display: flex;
   flex: ${({ flex }) => flex};
   height: 46px;
@@ -53,12 +51,6 @@ export const RowItem = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  background: ${({ checked, theme }) =>
-    checked ? 'rgba(66,134,244,0.1)' : null};
+  background: ${({ checked }) => (checked ? 'rgba(66,134,244,0.1)' : null)};
   cursor: ${({ cursor }) => (cursor ? cursor : 'default')};
-`;
-
-export const HeadCellMenuPopup = styled.ul`
-  max-height: 230px;
-  overflow-x: auto;
 `;
