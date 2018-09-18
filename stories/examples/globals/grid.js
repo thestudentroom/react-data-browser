@@ -7,7 +7,6 @@ export const GridItem = styled.div`
   padding: 10px;
   color: black;
   user-select: none;
-  cursor: pointer;
 `;
 
 export const Image = styled.img`

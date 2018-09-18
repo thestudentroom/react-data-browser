@@ -4,7 +4,12 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import GlobalStyle from './reset.css';
 
-import { SimpleTable, TableWithCheckbox, SimpleGrid } from './examples';
+import {
+  SimpleTable,
+  TableWithCheckbox,
+  SimpleGrid,
+  GridDraggable,
+} from './examples';
 
 storiesOf('Table', module)
   .add('Simple', () => <SimpleTable />)
@@ -27,5 +32,5 @@ storiesOf('Grid', module)
     />
   ))
   .add('Sort', () => <div>Todo</div>)
-  .add('Draggable', () => <div>Todo</div>)
+  .add('Draggable', () => <GridDraggable />)
   .add('React Virtualized', () => <div>Todo</div>);
