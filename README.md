@@ -11,6 +11,7 @@
 [![PRs Welcome][prs-badge]][prs] 
 [![Code of Conduct][coc-badge]][coc]
 [![size][size-badge]][unpkg-dist] [![gzip size][gzip-badge]][unpkg-dist]
+[![Storybook](https://github.com/storybooks/press/blob/master/badges/storybook.svg)](https://davidalekna.github.io/react-data-browser)
 
 ## The problem
 
