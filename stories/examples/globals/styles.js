@@ -1,11 +1,17 @@
-import styled, { css } from 'styled-components';
-import { FlexCol, FlexRow } from '../globals';
+import styled from 'styled-components';
 
-export const Table = styled(FlexCol)`
-  position: relative;
-  overflow: none;
-  width: 100vw;
-  height: 100%;
+export const FlexRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+export const FlexCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
 `;
 
 export const TableHead = styled(FlexRow)`

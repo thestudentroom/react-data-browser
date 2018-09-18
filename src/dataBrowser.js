@@ -54,6 +54,9 @@ export class DataBrowser extends React.Component {
     onChangeSortDirection: () => {},
     onSortData: () => {},
     onReplaceColumnFlex: () => {},
+    onDeselectAll: () => {},
+    onSelectAll: () => {},
+    onCheckboxToggle: () => {},
     viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
     initialColumnFlex: ['0 0 25%', '1 1 35%', '0 0 20%', '0 0 20%'],
     initialChecked: [],
@@ -138,27 +141,31 @@ export class DataBrowser extends React.Component {
   onSelection = ({ type, items } = {}) => {
     switch (this.getState().selectAllCheckboxState) {
       case true:
-        return this.onDeselectAll({ type });
+        return this.deselectAll({ type });
       case false:
-        return this.onSelectAll({ type, items });
+        return this.selectAll({ type, items });
       default:
-        return this.onDeselectAll({ type });
+        return this.deselectAll({ type });
     }
   };
-  onDeselectAll = ({
-    type = DataBrowser.stateChangeTypes.deselectAll,
-  } = {}) => {
-    this.internalSetState({ type, selectAllCheckboxState: false, checked: [] });
+  deselectAll = ({ type = DataBrowser.stateChangeTypes.deselectAll } = {}) => {
+    this.internalSetState(
+      { type, selectAllCheckboxState: false, checked: [] },
+      () => this.props.onDeselectAll(this.getState().checked),
+    );
   };
-  onSelectAll = ({
+  selectAll = ({
     type = DataBrowser.stateChangeTypes.selectAll,
     items,
   } = {}) => {
-    this.internalSetState({
-      type,
-      selectAllCheckboxState: true,
-      checked: items,
-    });
+    this.internalSetState(
+      {
+        type,
+        selectAllCheckboxState: true,
+        checked: items,
+      },
+      () => this.props.onSelectAll(this.getState().checked),
+    );
   };
   checkboxToggle = ({
     type = DataBrowser.stateChangeTypes.checkboxToggle,
@@ -175,14 +182,18 @@ export class DataBrowser extends React.Component {
             selectAllCheckboxState:
               this.props.totalItems === state.checked.length ? true : false,
           }));
+          this.props.onCheckboxToggle(this.getState().checked);
         },
       );
     } else {
-      this.internalSetState(state => ({
-        type,
-        selectAllCheckboxState: false,
-        checked: state.checked.filter(id => id !== rowId),
-      }));
+      this.internalSetState(
+        state => ({
+          type,
+          selectAllCheckboxState: false,
+          checked: state.checked.filter(id => id !== rowId),
+        }),
+        () => this.props.onCheckboxToggle(this.getState().checked),
+      );
     }
   };
   checkboxState = value => this.getState().checked.includes(value);

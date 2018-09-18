@@ -1,15 +1,18 @@
-import styled from 'styled-components';
+import React from 'react';
+import styled, { ThemeProvider } from 'styled-components';
+import { FlexCol } from './styles';
 
-export const FlexRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
+export const Root = styled(FlexCol)`
+  position: relative;
+  overflow: none;
+  width: 100vw;
+  height: 100%;
 `;
 
-export const FlexCol = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-`;
+export const Table = ({ children }) => (
+  <ThemeProvider theme={{}}>
+    <Root>{children}</Root>
+  </ThemeProvider>
+);
+
+export * from './styles';
