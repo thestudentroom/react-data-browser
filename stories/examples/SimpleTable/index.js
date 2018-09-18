@@ -3,7 +3,7 @@ import axios from 'axios';
 import DataBrowser, { getObjectPropertyByString } from '../../../src';
 import fieldReducer from './fieldReducer';
 import {
-  Table,
+  View,
   TableHead,
   HeadRowItem,
   TableBody,
@@ -40,7 +40,7 @@ export class SimpleTable extends React.Component {
         ]}
       >
         {({ columnFlex, visibleColumns }) => (
-          <Table>
+          <View>
             <TableHead>
               {visibleColumns.map((cell, index) => (
                 <HeadRowItem
@@ -76,7 +76,7 @@ export class SimpleTable extends React.Component {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+          </View>
         )}
       </DataBrowser>
     );

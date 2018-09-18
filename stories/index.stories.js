@@ -4,13 +4,28 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import GlobalStyle from './reset.css';
 
-import { SimpleTable, TableWithCheckbox } from './examples';
+import { SimpleTable, TableWithCheckbox, SimpleGrid } from './examples';
 
 storiesOf('Table', module)
   .add('Simple', () => <SimpleTable />)
-  .add('With Checkbox', () => (
+  .add('Checkbox', () => (
     <TableWithCheckbox
       onSelectAll={action('onSelectAll')}
       onCheckboxToggle={action('onCheckboxToggle')}
     />
-  ));
+  ))
+  .add('Sort', () => <div>Todo</div>)
+  .add('Column Replace', () => <div>Todo</div>)
+  .add('Draggable', () => <div>Todo</div>)
+  .add('React Virtualized', () => <div>Todo</div>);
+
+storiesOf('Grid', module)
+  .add('Checkbox', () => (
+    <SimpleGrid
+      onSelectAll={action('onSelectAll')}
+      onCheckboxToggle={action('onCheckboxToggle')}
+    />
+  ))
+  .add('Sort', () => <div>Todo</div>)
+  .add('Draggable', () => <div>Todo</div>)
+  .add('React Virtualized', () => <div>Todo</div>);

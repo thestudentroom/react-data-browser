@@ -3,7 +3,7 @@ import axios from 'axios';
 import DataBrowser, { getObjectPropertyByString } from '../../../src';
 import fieldReducer from './fieldReducer';
 import {
-  Table,
+  View,
   TableHead,
   HeadRowItem,
   TableBody,
@@ -49,7 +49,7 @@ export class TableWithCheckbox extends React.Component {
           checkboxToggle,
           checkboxState,
         }) => (
-          <Table>
+          <View>
             <TableHead>
               <HeadRowItem
                 style={{
@@ -115,7 +115,7 @@ export class TableWithCheckbox extends React.Component {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+          </View>
         )}
       </DataBrowser>
     );

@@ -37,5 +37,6 @@ injectGlobal`
     -ms-appearance: checkbox !important;
     -o-appearance: checkbox !important;
     appearance: checkbox !important;
+    cursor: pointer;
   }
 `;
