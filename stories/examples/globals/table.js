@@ -29,7 +29,7 @@ export const TableRow = styled(FlexRow)`
   border-bottom: 1px solid #eee;
   &:hover {
     background: ${({ selectable }) => selectable && '#4286f4'};
-    color: white;
+    color: ${({ selectable }) => selectable && 'white'};
   }
 `;
 

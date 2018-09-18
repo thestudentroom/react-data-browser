@@ -9,6 +9,7 @@ import {
   TableWithCheckbox,
   SimpleGrid,
   GridDraggable,
+  TableDraggable,
 } from './examples';
 
 storiesOf('Table', module)
@@ -21,7 +22,7 @@ storiesOf('Table', module)
   ))
   .add('Sort', () => <div>Todo</div>)
   .add('Column Replace', () => <div>Todo</div>)
-  .add('Draggable', () => <div>Todo</div>)
+  .add('Draggable', () => <TableDraggable />)
   .add('React Virtualized', () => <div>Todo</div>);
 
 storiesOf('Grid', module)
