@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import DataBrowser, { getObjectPropertyByString } from '../../../src';
-import { View, Image } from '../globals';
+import { View, TableHead, Image } from '../globals';
 import GridBoard from './GridBoard';
 import GirdCard from './GirdCard';
 import update from 'immutability-helper';
@@ -42,11 +42,36 @@ export class GridDraggable extends React.Component {
         onCheckboxToggle={this.props.onCheckboxToggle}
         columns={[{ label: 'name', sortField: 'name', isLocked: true }]}
       >
-        {({ visibleColumns }) => (
+        {({
+          visibleColumns,
+          selectAllCheckboxState,
+          onSelection,
+          checkboxState,
+          checkboxToggle,
+        }) => (
           <View>
+            <TableHead>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={selectAllCheckboxState}
+                  onChange={() =>
+                    onSelection({
+                      items: this.state.items.map(item => item.id),
+                    })
+                  }
+                />
+                <span>click me</span>
+              </label>
+            </TableHead>
             <GridBoard>
               {this.state.items.map((row, key) => (
                 <GirdCard key={key} index={key} moveCard={this.moveCard}>
+                  <input
+                    type="checkbox"
+                    checked={checkboxState(row.id)}
+                    onChange={() => checkboxToggle({ rowId: row.id })}
+                  />
                   {row.album && <Image src={row.album.url} alt="" />}
                   {visibleColumns.map(({ sortField }) => (
                     <div key={sortField}>
