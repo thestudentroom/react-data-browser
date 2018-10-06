@@ -1,5 +1,5 @@
 <h1 align="center">
-  DataBrowser 🗄 (beta)
+  DataBrowser 🗄 
 </h1>
 <p align="center" style="font-size: 1.2rem;">Primitive to build simple, flexible, enhanced flexbox tables or grid React components</p>
 
@@ -15,13 +15,13 @@
 
 ## The problem
 
-Its time consuming to build your own table functionality when you want something more specific than styled table components that already exist.
+Its time consuming to build your own table functionality when you want something unique or have more specific use case than table components that already exist.
 
 ## This solution
 
 DataBrowser component will provide common functionalities like checkbox, client side sorting, filtering, visible / offset columns and much more for your individual table components... 
 
-> NOTE: The original use case of this component is to build flexbox table list, however the API
+> NOTE: The original use case of this component is to build flexbox tables, however the API
 > is powerful and flexible enough to build things like grids as well.
 
 ## Table of Contents
@@ -69,7 +69,7 @@ should be installed as one of your project's `dependencies`:
 npm install --save react-data-browser
 ```
 
-> This package also depends on `react`, `hoist-non-react-statics` and `prop-types`. Please make sure you have those installed as well.
+> This package also depends on `react` and `prop-types`. Please make sure you have those installed as well.
 
 ## Usage
 
@@ -82,19 +82,9 @@ import React from 'react'
 import {render} from 'react-dom'
 import DataBrowser from 'react-data-browser'
 
-const columns = []
-
 render(
-  <DataBrowser columns={columns}>
-    {({
-      columnFlex,
-      visibleColumns,
-      selectAllCheckboxState,
-      checkboxState,
-      onSelection,
-      checkboxToggle,
-      viewType
-    }) => (
+  <DataBrowser columns={[]}>
+    {() => (
       <div />
     )}
   </DataBrowser>,
@@ -102,29 +92,17 @@ render(
 )
 ```
 
-`<DataBrowser />` is the only component exposed by this package. It doesn't render anything itself, it just calls the render function and renders that ["Use a render prop!"][use-a-render-prop]!
+This package exposes `<DataBrowser />`, `withDataBrowser()` components and `getObjectPropertyByString()` function.
+
+`<DataBrowser />` doesn't render anything itself, it just calls the render function and renders that ["Use a render prop!"][use-a-render-prop]!
 `<DataBrowser>{props => <div>/* your JSX here! */</div>}</DataBrowser>`.
 
-```jsx
-import React from 'react'
-import {withDataBrowser} from 'react-data-browser'
-
-const YourComponent = withDataBrowser(({dataBrowser}) => <div />)
-```
-
-`withDataBrowser()` is a higher order component to wrap your child components, it will provide a dataBrowser prop.
-
-```jsx
-import {getObjectPropertyByString} from 'react-data-browser'
-
-getObjectPropertyByString(object, 'object.property.that.you.want.to.access')
-```
-
-`getObjectPropertyByString()` is a function that helps to access nested properties on an object by string.
+`getObjectPropertyByString()` is a function that helps to access nested properties on an object by string. 
+Usage: `getObjectPropertyByString(object, 'object.property.that.you.want.to.access')`
 
 ## Basic Props
 
-This is the list of props that you should probably know about. There are some
+This is the list of props that you should know about. There are some
 [advanced props](#advanced-props) below as well.
 
 ### children
@@ -134,23 +112,44 @@ This is the list of props that you should probably know about. There are some
 This is called with an object. Read more about the properties of this object in
 the section "[Children Function](#children-function)".
 
+### initialSort
+
+> `Object<{ dir: string, sortField: string }>` optional
+
+sets an initial sort order.
+
 ### columns
 
-> `Array<>` | _required_
+> `Array<{ label: string, sortField: string, isLocked: boolean }>` | _required_
 
-Provide columns array that you wish to be visible in your component.
+Accepts an array of objects with any values you need + 3 values that are used by the component.
+label key will hold the label for the field, sortField will have to match data key name that you want
+to display from remote source. isLocked key will add isLocked props to the visibleColumns. 
+
+### viewsAvailable
+
+> `Array<string>` | optional | defaults to ['LIST_VIEW', 'GRID_VIEW']
+
+you can provide available views to your component and you will be able to toggle them later.
 
 ### totalItems
 
 > number | optional
 
-requires total items length (number) for the checkboxes to work properly
+totalItems is required if you have a sorting functionality on your table. It will help for the selectAllCheckbox to determin weather all items are selected or not.
+
+### initialChecked
+
+> `Array<string>` | optional
+
+Takes in an array of ids if you need to set initial checked items.
 
 ### initialColumnFlex
 
-> `Array<>` | optional
+> `Array<>` | optional | defaults to ['0 0 25%', '1 1 35%', '0 0 20%', '0 0 20%']
 
-Takes in an array of flexbox flex parameters for your columns, for example '1 1 40%'
+columnFlex has a default layout, if you'd like to overwrite it you can provide initialColumnFlex with an
+array of flex values you required or an array of arrays with flex values.
 
 ### stateReducer
 
@@ -187,9 +186,7 @@ function stateReducer(state, changes) {
 
 ### visibleColumns
 
-> `Array<>` | defaults to a generated visibleColumns
-
-Use for displaying head columns and row columns. 
+> `Array<string>` | defaults to generated visibleColumns
 
 ### viewType
 
@@ -199,25 +196,19 @@ Use for displaying head columns and row columns.
 
 > `boolean` | defaults to false
 
-Select all checkbox state
-
 ### currentSort
 
-> `object` | defaults to currentSort: { sortDirection: '', sortField: '' }
-
-Current sort holds sortDirection string and sortField string
+> `object` | defaults to currentSort: { dir: '', sortField: '' }
 
 ### checked
 
 > `Array<>` | control prop
 
-state that holds selected items
+state that holds selected item ids
 
 ### viewsAvailable
 
 > `Array<>` | defaults to internal implementation
-
-defaults to ['LIST_VIEW', 'GRID_VIEW']
 
 ### switchViewType
 
@@ -253,13 +244,19 @@ will accept item id and toggle the checkbox for that item
 
 > `function(props: object)` | defaults to internal implementation
 
-function for 'select all checbox'. 
+function for 'select all checkbox'. 
+
+### toggleSort
+
+> `function(props: object)` | defaults to internal implementation
+
+takes in sortField and toggles asc | dsc on it
 
 ### changeSortDirection
 
 > `function(props: object)` | defaults to internal implementation
 
-changes sort direction, will accept an object with {sortDirection: string}
+changes sort direction, will accept an object with {dir: string}
 
 ### defaultSortMethod
 
@@ -271,7 +268,7 @@ default sort method for client side sort implementation
 
 > `function()` | defaults to internal implementation
 
-will accept sortField and sortDirection
+will accept sortField and dir
 
 ### onStateChange
 
