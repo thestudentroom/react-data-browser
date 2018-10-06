@@ -15,7 +15,7 @@
 
 ## The problem
 
-Its time consuming to build your own table functionality when you want something unique or have more specific use case than table components that already exist.
+It's time consuming to build your own table functionality when you want something unique or have more specific use case than table components that already exist.
 
 ## This solution
 
