@@ -25,6 +25,7 @@ const DataBrowserContext = React.createContext({
   sortData: () => {},
   activeSort: () => {},
   replaceColumnFlex: () => {},
+  toggleSort: () => {},
 });
 
 export class DataBrowser extends React.Component {
@@ -58,6 +59,7 @@ export class DataBrowser extends React.Component {
     onDeselectAll: () => {},
     onSelectAll: () => {},
     onCheckboxToggle: () => {},
+    onToggleSort: () => {},
     initialSort: { dir: '', sortField: '' },
     viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
     initialColumnFlex: ['0 0 25%', '1 1 35%', '0 0 20%', '0 0 20%'],
@@ -71,6 +73,7 @@ export class DataBrowser extends React.Component {
     switchColumns: '__switch_columns__',
     switchView: '__switch_view__',
     sortData: '__sort_data__',
+    toggleSort: '__toggle_sort__',
     onItemClick: '__on_item_select__',
     replaceColumnFlex: '__replace_column_flex__',
     changeSortDirection: '__change_sort_directon__',
@@ -263,6 +266,21 @@ export class DataBrowser extends React.Component {
       () => this.props.onToggleSortDirection(this.getState().currentSort),
     );
   };
+  toggleSort = ({
+    type = DataBrowser.stateChangeTypes.toggleSort,
+    sortField,
+  } = {}) => {
+    this.internalSetState(
+      state => ({
+        type,
+        currentSort: {
+          dir: state.currentSort.dir === 'asc' ? 'dsc' : 'asc',
+          sortField,
+        },
+      }),
+      () => this.props.onToggleSort(this.getState().currentSort),
+    );
+  };
   sortData = ({
     type = DataBrowser.stateChangeTypes.sortData,
     sortField,
@@ -309,6 +327,7 @@ export class DataBrowser extends React.Component {
     sortData: this.sortData,
     activeSort: this.activeSort,
     replaceColumnFlex: this.replaceColumnFlex,
+    toggleSort: this.toggleSort,
   };
   state = this.initialState;
   isControlledProp(key) {

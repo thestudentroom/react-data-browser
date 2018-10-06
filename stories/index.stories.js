@@ -6,10 +6,12 @@ import GlobalStyle from './reset.css';
 
 import {
   SimpleTable,
+  Sortable,
   TableWithCheckbox,
   SimpleGrid,
   GridDraggable,
   TableDraggable,
+  ColumnReplace,
 } from './examples';
 
 storiesOf('Table', module)
@@ -20,8 +22,8 @@ storiesOf('Table', module)
       onCheckboxToggle={action('onCheckboxToggle')}
     />
   ))
-  .add('Sort', () => <div>Todo</div>)
-  .add('Column Replace', () => <div>Todo</div>)
+  .add('Sort', () => <Sortable />)
+  .add('Column Replace', () => <ColumnReplace />)
   .add('Draggable', () => <TableDraggable />)
   .add('React Virtualized', () => <div>Todo</div>);
 

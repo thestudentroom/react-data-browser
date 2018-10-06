@@ -14,7 +14,7 @@ export const HeadRowItem = styled(FlexRow)`
   flex: ${({ flex }) => flex};
   text-transform: uppercase;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: 10px;
 `;
 

@@ -13,6 +13,7 @@
     "axios": "^0.18.0",
     "downshift": "^2.2.2",
     "immutability-helper": "^2.8.1",
+    "ramda": "^0.25.0",
     "react": "^16.4.1",
     "react-dnd": "^5.0.0",
     "react-dnd-html5-backend": "^5.0.1",
