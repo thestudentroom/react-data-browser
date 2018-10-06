@@ -195,13 +195,15 @@ test('onSelection selectAllCheckboxState toggle', () => {
 test('changeSortDirection', () => {
   const handleStateChange = jest.fn();
   const { changeSortDirection } = setup({
+    initialSort: { dir: 'asc', sortField: '_id' },
     onStateChange: handleStateChange,
   });
-  changeSortDirection({ sortDirection: 'dsc' });
+  changeSortDirection({ dir: 'dsc' });
   const changes = {
     type: DataBrowser.stateChangeTypes.changeSortDirection,
     currentSort: {
-      sortDirection: 'dsc',
+      dir: 'dsc',
+      sortField: '_id',
     },
   };
   expect(handleStateChange).toHaveBeenCalledTimes(1);

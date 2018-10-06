@@ -6,13 +6,14 @@ import { getObjectPropertyByString, arrayHasArrays } from './utils';
 const DataBrowserContext = React.createContext({
   columnFlex: [],
   availableColumnFlex: null,
-  columns: [],
   visibleColumns: [],
   viewType: '',
-  viewsAvailable: false,
   selectAllCheckboxState: false,
   currentSort: {},
   checked: [],
+  // fns
+  getColumns: () => {},
+  getViews: () => {},
   switchViewType: () => {},
   switchColumns: () => {},
   checkboxState: () => {},
@@ -37,8 +38,8 @@ export class DataBrowser extends React.Component {
         isLocked: PropTypes.bool,
       }),
     ).isRequired,
-    currentSort: PropTypes.shape({
-      sortDirection: PropTypes.string,
+    initialSort: PropTypes.shape({
+      dir: PropTypes.string,
       sortField: PropTypes.string,
     }),
     stateReducer: PropTypes.func,
@@ -57,6 +58,7 @@ export class DataBrowser extends React.Component {
     onDeselectAll: () => {},
     onSelectAll: () => {},
     onCheckboxToggle: () => {},
+    initialSort: { dir: '', sortField: '' },
     viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
     initialColumnFlex: ['0 0 25%', '1 1 35%', '0 0 20%', '0 0 20%'],
     initialChecked: [],
@@ -125,18 +127,14 @@ export class DataBrowser extends React.Component {
     );
   };
   offsetColumns = () => {
-    const visible = this.getState().visibleColumns.map(
-      column => column.sortField,
-    );
-    return this.getState()
-      .columns.filter(c => !c.isLocked)
-      .map(column => {
-        if (visible.includes(column.sortField)) {
-          return Object.assign(column, { visible: true });
-        } else {
-          return Object.assign(column, { visible: false });
-        }
-      });
+    const visible = this.getState().visibleColumns.map(c => c.sortField);
+    return this.props.columns.filter(c => !c.isLocked).map(col => {
+      if (visible.includes(col.sortField)) {
+        return Object.assign(col, { visible: true });
+      } else {
+        return Object.assign(col, { visible: false });
+      }
+    });
   };
   onSelection = ({ type, items } = {}) => {
     switch (this.getState().selectAllCheckboxState) {
@@ -201,7 +199,7 @@ export class DataBrowser extends React.Component {
     type = DataBrowser.stateChangeTypes.switchView,
     viewType,
   } = {}) => {
-    if (this.state.viewsAvailable.includes(viewType)) {
+    if (this.props.viewsAvailable.includes(viewType)) {
       this.internalSetState({ type, viewType }, () =>
         this.props.onSwitchViewType(this.getState().viewType),
       );
@@ -210,8 +208,8 @@ export class DataBrowser extends React.Component {
     }
   };
   defaultSortMethod = (a, b) => {
-    const { sortField, sortDirection } = this.getState().currentSort;
-    if (sortField && sortDirection) {
+    const { sortField, dir } = this.getState().currentSort;
+    if (sortField && dir) {
       let nameA = getObjectPropertyByString(a, sortField);
       let nameB = getObjectPropertyByString(b, sortField);
       // force null and undefined to the bottom
@@ -221,7 +219,7 @@ export class DataBrowser extends React.Component {
       nameA = typeof nameA === 'string' ? nameA.toLowerCase() : nameA;
       nameB = typeof nameB === 'string' ? nameB.toLowerCase() : nameB;
       // Return either 1 or -1 to indicate a sort priority
-      if (sortDirection.toLowerCase() === 'asc') {
+      if (dir.toLowerCase() === 'asc') {
         if (nameA < nameB) {
           return -1;
         } else if (nameA > nameB) {
@@ -230,7 +228,7 @@ export class DataBrowser extends React.Component {
           return 0;
         }
       }
-      if (sortDirection.toLowerCase() === 'dsc') {
+      if (dir.toLowerCase() === 'dsc') {
         if (nameA > nameB) {
           return -1;
         } else if (nameA < nameB) {
@@ -244,17 +242,21 @@ export class DataBrowser extends React.Component {
   };
   changeSortDirection = ({
     type = DataBrowser.stateChangeTypes.changeSortDirection,
-    sortDirection = 'asc',
+    dir = 'asc',
   } = {}) => {
-    this.internalSetState({ type, currentSort: { sortDirection } }, () =>
-      this.props.onChangeSortDirection(this.getState().currentSort),
+    this.internalSetState(
+      state => ({
+        type,
+        currentSort: { sortField: state.currentSort.sortField, dir },
+      }),
+      () => this.props.onChangeSortDirection(this.getState().currentSort),
     );
   };
   toggleSortDirection = () => {
     this.internalSetState(
       ({ currentSort }) => ({
         currentSort: {
-          sortDirection: currentSort.sortDirection === 'asc' ? 'dsc' : 'asc',
+          dir: currentSort.dir === 'asc' ? 'dsc' : 'asc',
           sortField: currentSort.sortField,
         },
       }),
@@ -263,13 +265,13 @@ export class DataBrowser extends React.Component {
   };
   sortData = ({
     type = DataBrowser.stateChangeTypes.sortData,
-    sortField = 'id',
-    sortDirection = 'asc',
+    sortField,
+    dir,
   } = {}) => {
     this.internalSetState(
       {
         type,
-        currentSort: { sortField, sortDirection },
+        currentSort: { sortField, dir },
       },
       () => this.props.onSortData(this.getState().currentSort),
     );
@@ -277,7 +279,7 @@ export class DataBrowser extends React.Component {
   activeSort = (fieldName = '', sortDir = '') => {
     const currentSort = this.getState().currentSort;
     const isActive = currentSort.sortField === fieldName;
-    const isCurrentSortDir = currentSort.sortDirection === sortDir;
+    const isCurrentSortDir = currentSort.dir === sortDir;
     return isActive && isCurrentSortDir;
   };
   initialState = {
@@ -285,20 +287,17 @@ export class DataBrowser extends React.Component {
     availableColumnFlex: arrayHasArrays(this.props.initialColumnFlex)
       ? this.props.initialColumnFlex
       : null,
-    columns: this.props.columns,
     visibleColumns: this.props.columns.slice(
       0,
       this._columnFlexInitializer().length,
     ),
     viewType: 'LIST_VIEW',
-    viewsAvailable: this.props.viewsAvailable,
     selectAllCheckboxState: false,
-    currentSort: {
-      sortDirection: '',
-      sortField: '',
-    },
+    currentSort: this.props.initialSort,
     checked: this.props.initialChecked,
-    //
+    // fns
+    getColumns: () => this.props.columns,
+    getViews: () => this.props.viewsAvailable,
     switchViewType: this.switchViewType,
     switchColumns: this.switchColumns,
     checkboxState: this.checkboxState,
