@@ -1,9 +1,52 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import * as PropTypes from 'prop-types';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import { getObjectPropertyByString, arrayHasArrays } from './utils';
 
-const DataBrowserContext = React.createContext({
+type Props = {
+  stateReducer: Function;
+  onStateChange: Function;
+  onSwitchColumns: Function;
+  onSwitchViewType: Function;
+  onChangeSortDirection: Function;
+  onSortData: Function;
+  onReplaceColumnFlex: Function;
+  onDeselectAll: Function;
+  onSelectAll: Function;
+  onCheckboxToggle: Function;
+  onToggleSort: Function;
+  initialSort: { dir: string; sortField: string };
+  viewsAvailable: string[];
+  initialColumnFlex: string[];
+  initialChecked: string[];
+  totalItems: number;
+};
+
+type State = {
+  columnFlex: string[];
+  availableColumnFlex: null | string[];
+  visibleColumns: string[];
+  viewType: string;
+  selectAllCheckboxState: boolean;
+  currentSort: object;
+  checked: string[];
+  getColumns: Function;
+  getViews: Function;
+  switchViewType: Function;
+  switchColumns: Function;
+  checkboxState: Function;
+  offsetColumns: Function;
+  checkboxToggle: Function;
+  onSelection: Function;
+  changeSortDirection: Function;
+  defaultSortMethod: Function;
+  sortData: Function;
+  activeSort: Function;
+  replaceColumnFlex: Function;
+  toggleSort: Function;
+};
+
+const DataBrowserContext = React.createContext<State>({
   columnFlex: [],
   availableColumnFlex: null,
   visibleColumns: [],
@@ -28,7 +71,7 @@ const DataBrowserContext = React.createContext({
   toggleSort: () => {},
 });
 
-export class DataBrowser extends React.Component {
+export class DataBrowser extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.func,
     columnFlex: PropTypes.array,
@@ -49,7 +92,7 @@ export class DataBrowser extends React.Component {
     totalItems: PropTypes.number,
   };
   static defaultProps = {
-    stateReducer: (state, changes) => changes,
+    stateReducer: (state: State, changes: any) => changes,
     onStateChange: () => {},
     onSwitchColumns: () => {},
     onSwitchViewType: () => {},
@@ -131,13 +174,15 @@ export class DataBrowser extends React.Component {
   };
   offsetColumns = () => {
     const visible = this.getState().visibleColumns.map(c => c.sortField);
-    return this.props.columns.filter(c => !c.isLocked).map(col => {
-      if (visible.includes(col.sortField)) {
-        return Object.assign(col, { visible: true });
-      } else {
-        return Object.assign(col, { visible: false });
-      }
-    });
+    return this.props.columns
+      .filter(c => !c.isLocked)
+      .map(col => {
+        if (visible.includes(col.sortField)) {
+          return Object.assign(col, { visible: true });
+        } else {
+          return Object.assign(col, { visible: false });
+        }
+      });
   };
   onSelection = ({ type, items } = {}) => {
     switch (this.getState().selectAllCheckboxState) {
