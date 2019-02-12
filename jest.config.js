@@ -3,11 +3,17 @@ const ignores = [
   '/fixtures/',
   '/__tests__/helpers/',
   '__mocks__',
+  '__stories__',
 ];
 
 module.exports = {
   testPathIgnorePatterns: [...ignores],
-  testMatch: ['**/__tests__/**/*.+(js|jsx|ts|tsx)'],
+  roots: ['<rootDir>/src'],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   coveragePathIgnorePatterns: [...ignores],
   coverageThreshold: {
     global: {
