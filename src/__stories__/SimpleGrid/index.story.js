@@ -1,13 +1,15 @@
 import React from 'react';
+import { storiesOf } from '@storybook/react';
+import ShowDocs from '../../utils/ShowDocs';
 import axios from 'axios';
-import DataBrowser, { getObjectPropertyByString } from '../../../src';
+import DataBrowser, { getObjectPropertyByString } from '../../index';
 import { View, TableHead, Grid, GridItem, Image } from '../globals';
 
 const api = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com/',
 });
 
-export class SimpleGrid extends React.Component {
+export class Demo extends React.Component {
   state = { items: [], loading: true };
   async componentDidMount() {
     const [users, albums] = await Promise.all([
@@ -73,3 +75,7 @@ export class SimpleGrid extends React.Component {
     );
   }
 }
+
+storiesOf('simple grid', module)
+  .add('Docs', () => <ShowDocs md={require('../../../docs/sample.md')} />)
+  .add('Demo', () => <Demo />);

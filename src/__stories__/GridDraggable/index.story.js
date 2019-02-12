@@ -1,6 +1,8 @@
 import React from 'react';
+import { storiesOf } from '@storybook/react';
+import ShowDocs from '../../utils/ShowDocs';
 import axios from 'axios';
-import DataBrowser, { getObjectPropertyByString } from '../../../src';
+import DataBrowser, { getObjectPropertyByString } from '../../index';
 import { View, TableHead, Image } from '../globals';
 import GridBoard from './GridBoard';
 import GirdCard from './GirdCard';
@@ -10,7 +12,7 @@ const api = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com/',
 });
 
-export class GridDraggable extends React.Component {
+class Demo extends React.Component {
   state = { items: [], loading: true };
   async componentDidMount() {
     const [users, albums] = await Promise.all([
@@ -87,3 +89,7 @@ export class GridDraggable extends React.Component {
     );
   }
 }
+
+storiesOf('grid draggable', module)
+  .add('Docs', () => <ShowDocs md={require('../../../docs/sample.md')} />)
+  .add('Demo', () => <Demo />);

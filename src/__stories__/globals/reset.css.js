@@ -1,6 +1,6 @@
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
   * {
     border: 0;
     box-sizing: inherit;
@@ -40,3 +40,5 @@ injectGlobal`
     cursor: pointer;
   }
 `;
+
+export default GlobalStyle;

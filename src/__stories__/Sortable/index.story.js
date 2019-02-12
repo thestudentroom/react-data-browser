@@ -1,6 +1,9 @@
 import React from 'react';
+import { storiesOf } from '@storybook/react';
+import ShowDocs from '../../utils/ShowDocs';
 import axios from 'axios';
-import DataBrowser, { getObjectPropertyByString } from '../../../src';
+import sort from 'ramda/src/sort';
+import DataBrowser, { getObjectPropertyByString } from '../../index';
 import fieldReducer from './fieldReducer';
 import {
   View,
@@ -15,7 +18,7 @@ const api = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com/',
 });
 
-export class TableWithCheckbox extends React.Component {
+class Demo extends React.Component {
   state = { items: [], loading: true };
   async componentDidMount() {
     const [users, albums] = await Promise.all([
@@ -28,12 +31,19 @@ export class TableWithCheckbox extends React.Component {
     }));
     this.setState({ items, loading: false });
   }
+  renderArrow = (active, dir) => {
+    if (active) {
+      if (dir === 'asc') {
+        return '👆';
+      } else {
+        return `👇`;
+      }
+    }
+  };
   render() {
     return (
       <DataBrowser
         totalItems={this.state.items.length}
-        onSelectAll={this.props.onSelectAll}
-        onCheckboxToggle={this.props.onCheckboxToggle}
         columns={[
           { label: 'name', sortField: 'name', isLocked: true },
           { label: 'user name', sortField: 'username' },
@@ -44,56 +54,32 @@ export class TableWithCheckbox extends React.Component {
         {({
           columnFlex,
           visibleColumns,
-          selectAllCheckboxState,
-          onSelection,
-          checkboxToggle,
-          checkboxState,
+          sortData,
+          currentSort,
+          defaultSortMethod,
+          activeSort,
+          toggleSort,
         }) => (
           <View>
             <TableHead>
-              <HeadRowItem
-                style={{
-                  flex: '0 0 auto',
-                  position: 'relative',
-                  width: 30,
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectAllCheckboxState}
-                  onChange={() =>
-                    onSelection({
-                      items: this.state.items.map(item => item.id),
-                    })
-                  }
-                />
-              </HeadRowItem>
-              {visibleColumns.map((cell, index) => (
+              {visibleColumns.map(({ label, sortField }, index) => (
                 <HeadRowItem
+                  style={{ cursor: 'pointer' }}
                   key={index}
-                  selected={cell}
                   flex={columnFlex[index]}
+                  onClick={() => toggleSort({ sortField })}
                 >
-                  {cell.label}
+                  {this.renderArrow(
+                    currentSort.sortField === sortField,
+                    currentSort.dir,
+                  )}
+                  {label}
                 </HeadRowItem>
               ))}
             </TableHead>
             <TableBody>
-              {this.state.items.map((row, key) => (
+              {sort(defaultSortMethod, this.state.items).map((row, key) => (
                 <TableRow key={key} selectable>
-                  <TableRowItem
-                    style={{
-                      flex: '0 0 auto',
-                      position: 'relative',
-                      width: 30,
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checkboxState(row.id)}
-                      onChange={() => checkboxToggle({ rowId: row.id })}
-                    />
-                  </TableRowItem>
                   {visibleColumns.map(
                     ({ label, sortField, isLocked }, index) => (
                       <TableRowItem
@@ -121,3 +107,7 @@ export class TableWithCheckbox extends React.Component {
     );
   }
 }
+
+storiesOf('sortable', module)
+  .add('Docs', () => <ShowDocs md={require('../../../docs/sample.md')} />)
+  .add('Demo', () => <Demo />);

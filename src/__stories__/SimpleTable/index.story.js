@@ -1,7 +1,8 @@
 import React from 'react';
+import { storiesOf } from '@storybook/react';
+import ShowDocs from '../../utils/ShowDocs';
 import axios from 'axios';
-import sort from 'ramda/src/sort';
-import DataBrowser, { getObjectPropertyByString } from '../../../src';
+import DataBrowser, { getObjectPropertyByString } from '../../index';
 import fieldReducer from './fieldReducer';
 import {
   View,
@@ -16,7 +17,7 @@ const api = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com/',
 });
 
-export class Sortable extends React.Component {
+class Demo extends React.Component {
   state = { items: [], loading: true };
   async componentDidMount() {
     const [users, albums] = await Promise.all([
@@ -29,15 +30,6 @@ export class Sortable extends React.Component {
     }));
     this.setState({ items, loading: false });
   }
-  renderArrow = (active, dir) => {
-    if (active) {
-      if (dir === 'asc') {
-        return '👆';
-      } else {
-        return `👇`;
-      }
-    }
-  };
   render() {
     return (
       <DataBrowser
@@ -49,34 +41,21 @@ export class Sortable extends React.Component {
           { label: 'street', sortField: 'address.street' },
         ]}
       >
-        {({
-          columnFlex,
-          visibleColumns,
-          sortData,
-          currentSort,
-          defaultSortMethod,
-          activeSort,
-          toggleSort,
-        }) => (
+        {({ columnFlex, visibleColumns }) => (
           <View>
             <TableHead>
-              {visibleColumns.map(({ label, sortField }, index) => (
+              {visibleColumns.map((cell, index) => (
                 <HeadRowItem
-                  style={{ cursor: 'pointer' }}
                   key={index}
+                  selected={cell}
                   flex={columnFlex[index]}
-                  onClick={() => toggleSort({ sortField })}
                 >
-                  {this.renderArrow(
-                    currentSort.sortField === sortField,
-                    currentSort.dir,
-                  )}
-                  {label}
+                  {cell.label}
                 </HeadRowItem>
               ))}
             </TableHead>
             <TableBody>
-              {sort(defaultSortMethod, this.state.items).map((row, key) => (
+              {this.state.items.map((row, key) => (
                 <TableRow key={key} selectable>
                   {visibleColumns.map(
                     ({ label, sortField, isLocked }, index) => (
@@ -105,3 +84,7 @@ export class Sortable extends React.Component {
     );
   }
 }
+
+storiesOf('simple table', module)
+  .add('Docs', () => <ShowDocs md={require('../../../docs/sample.md')} />)
+  .add('Demo', () => <Demo />);
