@@ -19,7 +19,7 @@ import {
 function Demo({ onSelectAll, onCheckboxToggle }) {
   const { rows, loading } = useRows();
   return (
-    <React.Fragment>
+    <>
       <GlobalStyle />
       <DataBrowser
         totalItems={rows.length}
@@ -114,7 +114,7 @@ function Demo({ onSelectAll, onCheckboxToggle }) {
           );
         }}
       </DataBrowser>
-    </React.Fragment>
+    </>
   );
 }
 

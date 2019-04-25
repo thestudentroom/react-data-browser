@@ -26,5 +26,5 @@ export default function useRows() {
     fetchRows();
   }, []);
 
-  return { data: rows, loading };
+  return { rows, loading };
 }
