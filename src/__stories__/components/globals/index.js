@@ -1,6 +1,29 @@
 import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
+import {
+  space,
+  width,
+  fontSize,
+  color,
+  flex,
+  alignItems,
+  justifyContent,
+  flexDirection,
+} from 'styled-system';
 
+export const Flex = styled.div`
+  display: flex;
+  /*  */
+  ${flex}
+  ${alignItems}
+  ${justifyContent}
+  ${flexDirection}
+  /*  */
+  ${space}
+  ${width}
+  ${fontSize}
+  ${color}
+`;
 export const FlexRow = styled.div`
   display: flex;
   flex-direction: row;
@@ -16,9 +39,11 @@ export const FlexCol = styled.div`
 `;
 
 const RootView = styled(FlexCol)`
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   position: relative;
   overflow: none;
-  width: 100vw;
+  width: 100%;
   height: 100%;
 `;
 

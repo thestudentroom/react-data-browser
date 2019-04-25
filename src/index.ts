@@ -1,4 +1,15 @@
-import { DataBrowser, withDataBrowser } from './dataBrowser';
 import { getObjectPropertyByString } from './utils';
+import {
+  DataBrowser,
+  DataBrowserContext,
+  withDataBrowser,
+  useDataBrowser,
+} from './dataBrowser';
 
-export { DataBrowser as default, withDataBrowser, getObjectPropertyByString };
+export {
+  DataBrowser as default,
+  DataBrowserContext,
+  withDataBrowser,
+  useDataBrowser,
+  getObjectPropertyByString,
+};

@@ -1,8 +1,8 @@
 import * as React from 'react';
+import { sort } from 'ramda';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import ShowDocs from '../../../utils/ShowDocs';
-import { sort } from 'ramda';
 import DataBrowser, { getObjectPropertyByString } from '../../../index';
 import fieldReducer from './fieldReducer';
 import { View } from '../../components/globals';

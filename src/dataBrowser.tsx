@@ -81,13 +81,13 @@ export class DataBrowser extends React.Component<Props, State> {
     changeSortDirection: '__change_sort_directon__',
   };
   static Consumer = DataBrowserContext.Consumer;
-  _columnFlexInitializer = () => {
+  private _columnFlexInitializer = () => {
     return arrayHasArrays(this.props.initialColumnFlex)
       ? this.props.initialColumnFlex[0]
       : this.props.initialColumnFlex;
   };
   /**
-   * switchColumns replaces visible column with selected from offset one
+   * switchColumns replaces visible column with selected one from the offset
    */
   switchColumns = ({
     type = DataBrowser.stateChangeTypes.switchColumns,
@@ -470,4 +470,9 @@ export function withDataBrowser(Component) {
     Component.name})`;
   hoistNonReactStatics(Wrapper, Component);
   return Wrapper;
+}
+
+export function useDataBrowser() {
+  const browserUtils = React.useContext(DataBrowserContext);
+  return browserUtils;
 }
