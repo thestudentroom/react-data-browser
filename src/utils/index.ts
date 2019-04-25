@@ -1,4 +1,4 @@
-export const getObjectPropertyByString = (obj: object, path: string) => {
+export const getObjectPropertyByString = (obj: object, path: string): any => {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 };
 

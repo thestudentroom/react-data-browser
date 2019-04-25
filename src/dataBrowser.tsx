@@ -2,8 +2,9 @@ import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import { getObjectPropertyByString, arrayHasArrays } from './utils';
+import { State, Props } from './types';
 
-const DataBrowserContext = React.createContext({
+const DataBrowserContext = React.createContext<State>({
   columnFlex: [],
   availableColumnFlex: null,
   visibleColumns: [],
@@ -11,7 +12,6 @@ const DataBrowserContext = React.createContext({
   selectAllCheckboxState: false,
   currentSort: {},
   checked: [],
-  // fns
   getColumns: () => {},
   getViews: () => {},
   switchViewType: () => {},
@@ -28,7 +28,7 @@ const DataBrowserContext = React.createContext({
   toggleSort: () => {},
 });
 
-export class DataBrowser extends React.Component {
+export class DataBrowser extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.func,
     columnFlex: PropTypes.array,
@@ -49,7 +49,7 @@ export class DataBrowser extends React.Component {
     totalItems: PropTypes.number,
   };
   static defaultProps = {
-    stateReducer: (state, changes) => changes,
+    stateReducer: (state: State, changes: unknown) => changes,
     onStateChange: () => {},
     onSwitchColumns: () => {},
     onSwitchViewType: () => {},
@@ -88,22 +88,24 @@ export class DataBrowser extends React.Component {
     type = DataBrowser.stateChangeTypes.switchColumns,
     from,
     to,
-  }: { type?: string, to?: string, from?: string } = {}) => {
+  }: { type?: string; to?: string; from?: string } = {}) => {
     const { visibleColumns: columns, offsetColumns } = this.getState();
-    const index = columns.findIndex(x => x.sortField === from);
-    const visibleColumns = columns.filter(col => col.sortField !== from);
-    const replacement = offsetColumns().find(
-      ({ sortField }) => sortField === to,
-    );
-    visibleColumns.splice(index, 0, replacement);
-    this.internalSetState({ type, visibleColumns }, () =>
-      this.props.onSwitchColumns(this.getState().visibleColumns),
-    );
+    if (columns && offsetColumns) {
+      const index = columns.findIndex(x => x.sortField === from);
+      const visibleColumns = columns.filter(col => col.sortField !== from);
+      const replacement = offsetColumns().find(
+        ({ sortField }) => sortField === to,
+      );
+      visibleColumns.splice(index, 0, replacement);
+      this.internalSetState({ type, visibleColumns }, () =>
+        this.props.onSwitchColumns(this.getState().visibleColumns),
+      );
+    }
   };
   replaceColumnFlex = ({
     type = DataBrowser.stateChangeTypes.replaceColumnFlex,
     columnFlex = '',
-  }: { type?: string, columnFlex?: string } = {}) => {
+  }: { type?: string; columnFlex?: string } = {}) => {
     this.internalSetState(
       state => {
         const visibleSortFields = state.visibleColumns
@@ -130,18 +132,23 @@ export class DataBrowser extends React.Component {
     );
   };
   offsetColumns = () => {
-    const visible = this.getState().visibleColumns.map(c => c.sortField);
-    return this.props.columns
-      .filter(c => !c.isLocked)
-      .map(col => {
-        if (visible.includes(col.sortField)) {
-          return Object.assign(col, { visible: true });
-        } else {
-          return Object.assign(col, { visible: false });
-        }
-      });
+    const visibleColumns = this.getState().visibleColumns;
+    if (visibleColumns) {
+      const visible = visibleColumns.map(c => c.sortField);
+      return this.props.columns
+        .filter(c => !c.isLocked)
+        .map(col => {
+          if (visible.includes(col.sortField)) {
+            return Object.assign(col, { visible: true });
+          } else {
+            return Object.assign(col, { visible: false });
+          }
+        });
+    } else {
+      return this.props.columns;
+    }
   };
-  onSelection = ({ type, items }: { type?: string, items?: string[] } = {}) => {
+  onSelection = ({ type, items }: { type?: string; items?: string[] } = {}) => {
     switch (this.getState().selectAllCheckboxState) {
       case true:
         return this.deselectAll({ type });
@@ -160,7 +167,7 @@ export class DataBrowser extends React.Component {
   selectAll = ({
     type = DataBrowser.stateChangeTypes.selectAll,
     items,
-  }: { type?: string, items?: string[] } = {}) => {
+  }: { type?: string; items?: string[] } = {}) => {
     this.internalSetState(
       {
         type,
@@ -172,38 +179,55 @@ export class DataBrowser extends React.Component {
   };
   checkboxToggle = ({
     type = DataBrowser.stateChangeTypes.checkboxToggle,
-    rowId,
-  }: { type?: string, rowId?: string } = {}) => {
-    if (!this.getState().checked.includes(rowId)) {
-      this.internalSetState(
-        state => ({
-          type,
-          checked: [...state.checked, rowId],
-        }),
-        () => {
-          this.setState(state => ({
-            selectAllCheckboxState:
-              this.props.totalItems === state.checked.length ? true : false,
-          }));
-          this.props.onCheckboxToggle(this.getState().checked);
-        },
-      );
-    } else {
-      this.internalSetState(
-        state => ({
-          type,
-          selectAllCheckboxState: false,
-          checked: state.checked.filter(id => id !== rowId),
-        }),
-        () => this.props.onCheckboxToggle(this.getState().checked),
-      );
+    rowId = '',
+  }: { type?: string; rowId?: string } = {}) => {
+    const checked = this.getState().checked;
+    if (checked) {
+      if (!checked.includes(rowId)) {
+        this.internalSetState(
+          state => ({
+            type,
+            checked: [...state.checked, rowId],
+          }),
+          () => {
+            this.setState(state => {
+              if (state.checked) {
+                return {
+                  selectAllCheckboxState:
+                    this.props.totalItems === state.checked.length
+                      ? true
+                      : false,
+                };
+              } else {
+                //  ???
+                return {};
+              }
+            });
+            this.props.onCheckboxToggle(checked);
+          },
+        );
+      } else {
+        this.internalSetState(
+          state => ({
+            type,
+            selectAllCheckboxState: false,
+            checked: state.checked.filter(id => id !== rowId),
+          }),
+          () => this.props.onCheckboxToggle(checked),
+        );
+      }
     }
   };
-  checkboxState = value => this.getState().checked.includes(value);
+  checkboxState = value => {
+    const checked = this.getState().checked;
+    if (checked) {
+      checked.includes(value);
+    }
+  };
   switchViewType = ({
     type = DataBrowser.stateChangeTypes.switchView,
     viewType = '',
-  }: { type?: string, viewType?: string } = {}) => {
+  }: { type?: string; viewType?: string } = {}) => {
     if (this.props.viewsAvailable.includes(viewType)) {
       this.internalSetState({ type, viewType }, () =>
         this.props.onSwitchViewType(this.getState().viewType),
@@ -212,7 +236,7 @@ export class DataBrowser extends React.Component {
       console.warn(`${viewType} not in available views`);
     }
   };
-  defaultSortMethod = (a: unknown, b: unknown) => {
+  defaultSortMethod = (a: object, b: object) => {
     const { sortField, dir } = this.getState().currentSort;
     if (sortField && dir) {
       let nameA = getObjectPropertyByString(a, sortField);
@@ -272,7 +296,7 @@ export class DataBrowser extends React.Component {
   toggleSort = ({
     type = DataBrowser.stateChangeTypes.toggleSort,
     sortField,
-  }: { type?: string, sortField?: string } = {}) => {
+  }: { type?: string; sortField?: string } = {}) => {
     this.internalSetState(
       state => ({
         type,
@@ -288,7 +312,7 @@ export class DataBrowser extends React.Component {
     type = DataBrowser.stateChangeTypes.sortData,
     sortField,
     dir,
-  }: { type?: string, sortField?: string, dir?: string } = {}) => {
+  }: { type?: string; sortField?: string; dir?: string } = {}) => {
     this.internalSetState(
       {
         type,
@@ -333,10 +357,10 @@ export class DataBrowser extends React.Component {
     toggleSort: this.toggleSort,
   };
   state = this.initialState;
-  isControlledProp(key) {
+  isControlledProp(key: string) {
     return this.props[key] !== undefined;
   }
-  getState(stateToMerge = this.state) {
+  getState(stateToMerge = this.state): State {
     return Object.keys(stateToMerge).reduce((state, key) => {
       state[key] = this.isControlledProp(key)
         ? this.props[key]
@@ -347,7 +371,7 @@ export class DataBrowser extends React.Component {
   internalSetState = (changes, callback = () => {}) => {
     let allChanges;
     this.setState(
-      currentState => {
+      (currentState: any) => {
         const combinedState = this.getState(currentState);
         return [changes]
           .map(c => (typeof c === 'function' ? c(currentState) : c))
