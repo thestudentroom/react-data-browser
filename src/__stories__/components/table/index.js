@@ -8,6 +8,7 @@ export const TableHead = styled(FlexRow)`
   border-bottom: 1px solid #ccc;
   padding: 0 5px;
   font-size: 12px;
+  user-select: none;
 `;
 
 export const HeadRowItem = styled(FlexRow)`
@@ -16,6 +17,7 @@ export const HeadRowItem = styled(FlexRow)`
   align-items: center;
   justify-content: space-between;
   padding: 10px;
+  cursor: pointer;
 `;
 
 export const TableBody = styled(FlexCol)`

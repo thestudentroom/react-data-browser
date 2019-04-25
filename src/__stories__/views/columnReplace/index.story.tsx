@@ -1,11 +1,12 @@
-import React from 'react';
-import axios from 'axios';
+import * as React from 'react';
 import { storiesOf } from '@storybook/react';
+import { action } from '@storybook/addon-actions';
 import ShowDocs from '../../../utils/ShowDocs';
+import { sort } from 'ramda';
 import DataBrowser, { getObjectPropertyByString } from '../../../index';
 import fieldReducer from './fieldReducer';
 import { View } from '../../components/globals';
-import useRows from '../../hooks/useRows';
+import useData from '../../hooks/useData';
 import {
   TableHead,
   HeadRowItem,
@@ -14,36 +15,45 @@ import {
   TableRowItem,
 } from '../../components/table';
 
-function Demo() {
-  const { data, loading } = useRows();
+const columns = [
+  { label: 'name', sortField: 'name', isLocked: true },
+  { label: 'user name', sortField: 'username' },
+  { label: 'email', sortField: 'email' },
+  { label: 'street', sortField: 'address.street' },
+];
+
+function Demo({ onTableRowClick, onToggleSort }) {
+  const { data } = useData();
   return (
     <DataBrowser
+      columns={columns}
       totalItems={data.length}
-      columns={[
-        { label: 'name', sortField: 'name', isLocked: true },
-        { label: 'user name', sortField: 'username' },
-        { label: 'email', sortField: 'email' },
-        { label: 'street', sortField: 'address.street' },
-      ]}
+      // on trigger log
+      onToggleSort={field => onToggleSort(`${field.sortField}-${field.dir}`)}
     >
-      {({ columnFlex, visibleColumns }) => (
+      {({ columnFlex, visibleColumns, defaultSortMethod, toggleSort }) => (
         <View>
           <TableHead>
             {visibleColumns.map((cell, index) => (
-              <HeadRowItem key={index} selected={cell} flex={columnFlex[index]}>
+              <HeadRowItem
+                key={index}
+                selected={cell}
+                flex={columnFlex[index]}
+                onClick={() => toggleSort({ sortField: cell.sortField })}
+              >
                 {cell.label}
               </HeadRowItem>
             ))}
           </TableHead>
           <TableBody>
-            {data.map((row, key) => (
+            {sort(defaultSortMethod, data).map((row, key) => (
               <TableRow key={key} selectable>
-                {visibleColumns.map(({ label, sortField, isLocked }, index) => (
+                {visibleColumns.map(({ sortField, isLocked }, index) => (
                   <TableRowItem
                     key={sortField}
                     flex={columnFlex[index]}
                     cursor="pointer"
-                    onClick={() => alert(`🦄 clicked on a row (id) ${row.id}`)}
+                    onClick={() => onTableRowClick(`row id ${row.id}`)}
                   >
                     {isLocked && `🔒 `}
                     {fieldReducer(
@@ -63,4 +73,9 @@ function Demo() {
 
 storiesOf('column replace', module)
   .add('Docs', () => <ShowDocs md={require('../../../../docs/sample.md')} />)
-  .add('Demo', () => <Demo />);
+  .add('Demo', () => (
+    <Demo
+      onTableRowClick={action('onTableRowClick')}
+      onToggleSort={action('onToggleSort')}
+    />
+  ));

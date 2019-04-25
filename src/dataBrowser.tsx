@@ -4,7 +4,7 @@ import hoistNonReactStatics from 'hoist-non-react-statics';
 import { getObjectPropertyByString, arrayHasArrays } from './utils';
 import { State, Props } from './types';
 
-const DataBrowserContext = React.createContext<State>({
+export const DataBrowserContext = React.createContext<State>({
   columnFlex: [],
   availableColumnFlex: null,
   visibleColumns: [],
@@ -12,6 +12,7 @@ const DataBrowserContext = React.createContext<State>({
   selectAllCheckboxState: false,
   currentSort: {},
   checked: [],
+  // fns
   getColumns: () => {},
   getViews: () => {},
   switchViewType: () => {},
@@ -60,6 +61,7 @@ export class DataBrowser extends React.Component<Props, State> {
     onSelectAll: () => {},
     onCheckboxToggle: () => {},
     onToggleSort: () => {},
+    onToggleSortDirection: () => {},
     initialSort: { dir: '', sortField: '' },
     viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
     initialColumnFlex: ['0 0 25%', '1 1 35%', '0 0 20%', '0 0 20%'],
@@ -84,6 +86,9 @@ export class DataBrowser extends React.Component<Props, State> {
       ? this.props.initialColumnFlex[0]
       : this.props.initialColumnFlex;
   };
+  /**
+   * switchColumns replaces visible column with selected from offset one
+   */
   switchColumns = ({
     type = DataBrowser.stateChangeTypes.switchColumns,
     from,
@@ -102,6 +107,9 @@ export class DataBrowser extends React.Component<Props, State> {
       );
     }
   };
+  /**
+   * replaceColumnFlex
+   */
   replaceColumnFlex = ({
     type = DataBrowser.stateChangeTypes.replaceColumnFlex,
     columnFlex = '',
@@ -131,8 +139,11 @@ export class DataBrowser extends React.Component<Props, State> {
         }),
     );
   };
+  /**
+   * offsetColumns returns columns that are note visible on the table
+   */
   offsetColumns = () => {
-    const visibleColumns = this.getState().visibleColumns;
+    const { visibleColumns } = this.getState();
     if (visibleColumns) {
       const visible = visibleColumns.map(c => c.sortField);
       return this.props.columns
@@ -148,6 +159,9 @@ export class DataBrowser extends React.Component<Props, State> {
       return this.props.columns;
     }
   };
+  /**
+   * onSelection checks if all checboxes selected and manages selectAllCheckboxState state
+   */
   onSelection = ({ type, items }: { type?: string; items?: string[] } = {}) => {
     switch (this.getState().selectAllCheckboxState) {
       case true:
@@ -158,12 +172,18 @@ export class DataBrowser extends React.Component<Props, State> {
         return this.deselectAll({ type });
     }
   };
+  /**
+   * deselectAll resets checkbox checked[] state to be empty
+   */
   deselectAll = ({ type = DataBrowser.stateChangeTypes.deselectAll } = {}) => {
     this.internalSetState(
       { type, selectAllCheckboxState: false, checked: [] },
       () => this.props.onDeselectAll(this.getState().checked),
     );
   };
+  /**
+   * selectAll checkbox to pull all ids into checked[] state
+   */
   selectAll = ({
     type = DataBrowser.stateChangeTypes.selectAll,
     items,
@@ -177,6 +197,9 @@ export class DataBrowser extends React.Component<Props, State> {
       () => this.props.onSelectAll(this.getState().checked),
     );
   };
+  /**
+   * checkboxToggle toggles or untoggles row
+   */
   checkboxToggle = ({
     type = DataBrowser.stateChangeTypes.checkboxToggle,
     rowId = '',
@@ -218,12 +241,18 @@ export class DataBrowser extends React.Component<Props, State> {
       }
     }
   };
+  /**
+   * checkboxState helps to determin current checkbox check state
+   */
   checkboxState = value => {
     const checked = this.getState().checked;
     if (checked) {
       checked.includes(value);
     }
   };
+  /**
+   * switchViewType triggers view switch (grid or list or others). To be improved...
+   */
   switchViewType = ({
     type = DataBrowser.stateChangeTypes.switchView,
     viewType = '',
@@ -236,6 +265,9 @@ export class DataBrowser extends React.Component<Props, State> {
       console.warn(`${viewType} not in available views`);
     }
   };
+  /**
+   * defaultSortMethod is for sort function which is usually taken from ramda or lodash
+   */
   defaultSortMethod = (a: object, b: object) => {
     const { sortField, dir } = this.getState().currentSort;
     if (sortField && dir) {
@@ -270,6 +302,9 @@ export class DataBrowser extends React.Component<Props, State> {
     }
     return undefined;
   };
+  /**
+   * changeSortDirection changes direction to provided dir prop
+   */
   changeSortDirection = ({
     type = DataBrowser.stateChangeTypes.changeSortDirection,
     dir = 'asc',
@@ -282,6 +317,9 @@ export class DataBrowser extends React.Component<Props, State> {
       () => this.props.onChangeSortDirection(this.getState().currentSort),
     );
   };
+  /**
+   * toggleSortDirection toggles current sort direction
+   */
   toggleSortDirection = () => {
     this.internalSetState(
       ({ currentSort }) => ({
@@ -293,6 +331,9 @@ export class DataBrowser extends React.Component<Props, State> {
       () => this.props.onToggleSortDirection(this.getState().currentSort),
     );
   };
+  /**
+   * toggleSort toggles data on provided sortField
+   */
   toggleSort = ({
     type = DataBrowser.stateChangeTypes.toggleSort,
     sortField,
@@ -308,6 +349,9 @@ export class DataBrowser extends React.Component<Props, State> {
       () => this.props.onToggleSort(this.getState().currentSort),
     );
   };
+  /**
+   * sortData sorts data on specific sortField and direction provided
+   */
   sortData = ({
     type = DataBrowser.stateChangeTypes.sortData,
     sortField,
@@ -321,7 +365,10 @@ export class DataBrowser extends React.Component<Props, State> {
       () => this.props.onSortData(this.getState().currentSort),
     );
   };
-  activeSort = (fieldName = '', sortDir = '') => {
+  /**
+   * activeSort is used on every sort element to determine if the current sort is that field
+   */
+  activeSort = (fieldName = '', sortDir = ''): boolean => {
     const currentSort = this.getState().currentSort;
     const isActive = currentSort.sortField === fieldName;
     const isCurrentSortDir = currentSort.dir === sortDir;

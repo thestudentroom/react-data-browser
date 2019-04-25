@@ -1,11 +1,11 @@
-import React from 'react';
+import * as React from 'react';
 import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com/',
 });
 
-export default function useRows() {
+export default function useData() {
   const [rows, setRows] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
