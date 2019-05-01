@@ -31,7 +31,7 @@ export const DataBrowserContext = React.createContext<State>({
 
 export class DataBrowser extends React.Component<Props, State> {
   static propTypes = {
-    children: PropTypes.func,
+    children: PropTypes.func.isRequired,
     columnFlex: PropTypes.array,
     columns: PropTypes.arrayOf(
       PropTypes.shape({

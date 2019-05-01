@@ -63,4 +63,18 @@ const RootGrid = styled.section`
   grid-template-columns: repeat(auto-fill, minmax(260px, auto));
 `;
 
+export const Transition = {
+  hover: {
+    on: 'all 0.2s ease-in',
+    off: 'all 0.2s ease-out',
+  },
+  reaction: {
+    on: 'all 0.15s ease-in',
+    off: 'all 0.1s ease-out',
+  },
+  dropdown: {
+    off: 'all 0.35s ease-out',
+  },
+};
+
 export const Grid = ({ children }) => <RootGrid>{children}</RootGrid>;
