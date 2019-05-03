@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '../icons';
 import {
   StyledCheckboxWrapper,
   StyledHiddenInput,
@@ -6,6 +7,38 @@ import {
 } from './styles';
 
 // todo create and import icon
+
+function pickAppropriateCheckbox({
+  checked,
+  selectAllCheckboxState,
+  disabled,
+}) {
+  if (typeof checked === 'boolean') {
+    switch (checked) {
+      case true:
+        return <Icon name="Checkbox" />;
+      case false:
+        return (
+          <Icon name="CheckboxBaseline" color={disabled ? '#CCC' : '#777'} />
+        );
+      default:
+        return null;
+    }
+  }
+
+  if (typeof selectAllCheckboxState === 'string') {
+    switch (selectAllCheckboxState) {
+      case 'all':
+        return <Icon name="Checkbox" />;
+      case 'some':
+        return <Icon name="CheckboxIndetermined" />;
+      default:
+        return (
+          <Icon name="CheckboxBaseline" color={disabled ? '#CCC' : '#777'} />
+        );
+    }
+  }
+}
 
 export const Checkbox = props => {
   return (
@@ -19,13 +52,7 @@ export const Checkbox = props => {
             : null
         }
       >
-        {props.checked ? (
-          <Icon color="#777">check_box</Icon>
-        ) : (
-          <Icon color={props.disabled ? '#CCC' : '#777'}>
-            check_box_outline_blank
-          </Icon>
-        )}
+        {pickAppropriateCheckbox(props)}
         <StyledHiddenInput
           type="checkbox"
           id={props.id}

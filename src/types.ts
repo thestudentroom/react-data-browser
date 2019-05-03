@@ -24,14 +24,16 @@ export type Props = {
   columns: Column[];
 };
 
+export type CheckboxAllState = 'all' | 'none' | 'some' | string;
+
 export type State = {
   columnFlex?: string[] | string[][] | any;
   availableColumnFlex?: null | string[];
   visibleColumns?: Column[];
   viewType?: string;
-  selectAllCheckboxState?: boolean;
+  selectAllCheckboxState?: CheckboxAllState;
   currentSort?: any;
-  checked?: string[];
+  checkedItems?: string[];
   getColumns?: () => Column[] | void;
   getViews?: Function;
   switchViewType?: Function;

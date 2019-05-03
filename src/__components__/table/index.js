@@ -1,51 +1,75 @@
+import React from 'react';
 import styled from 'styled-components';
-import { FlexRow, FlexCol } from '../globals';
 
-export const TableHead = styled(FlexRow)`
-  flex: 0 0 auto;
-  height: 46px;
-  color: black;
-  border-bottom: 1px solid #ccc;
-  padding: 0 5px;
-  font-size: 12px;
-  user-select: none;
-`;
+export * from './styles';
 
-export const HeadRowItem = styled(FlexRow)`
-  flex: ${({ flex }) => flex};
-  text-transform: uppercase;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  cursor: pointer;
-`;
-
-export const TableBody = styled(FlexCol)`
-  flex: 1 1 auto;
-  overflow-x: auto;
-  padding: 0 5px;
-`;
-
-export const TableRow = styled(FlexRow)`
-  flex: 0 0 auto;
-  border-bottom: 1px solid #eee;
-  &:hover {
-    background: ${({ selectable }) => selectable && '#4286f4'};
-    color: ${({ selectable }) => selectable && 'white'};
+export const CellWithMenu = styled.div`
+  position: absolute;
+  min-height: 120px;
+  z-index: 10;
+  outline: none;
+  border: 1px dashed red;
+  background: white;
+  width: ${({ width }) => (width ? `${width}px` : '170px')};
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  top: ${({ top }) => (top ? `${top}px` : null)};
+  right: ${({ right }) => (right ? `${right}px` : null)};
+  left: ${({ left }) => (left ? `${left}px` : null)};
+  ul {
+    margin: 0;
+    padding: 5px 0 5px 0;
+  }
+  ul > li {
+    text-transform: capitalize;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    height: 28px;
+    padding: 18px 35px;
+    font-size: 14px;
+    color: #222;
+    font-weight: 400;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  ul > li:hover {
+    background: ${({ theme }) => theme.colours.primary['500']};
+    color: white;
+    transition: all 0.2s ease;
+  }
+  span {
+    display: block;
+    color: ${({ theme }) => theme.colours.neutral['900']};
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 11px;
+    padding: 18px 35px 10px 35px;
   }
 `;
 
-export const TableRowItem = styled.div`
-  display: flex;
-  flex: ${({ flex }) => flex};
-  height: 46px;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0 10px;
-  font-size: 14px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  background: ${({ checked }) => (checked ? 'rgba(66,134,244,0.1)' : null)};
-  cursor: ${({ cursor }) => (cursor ? cursor : 'default')};
+export const ItemOptionsMenu = ({ onClick }) => (
+  <CellWithMenu top={34} right={1}>
+    <div style={{ borderBottom: '1px solid #ddd' }}>
+      <ul onClick={onClick}>
+        <li>Edit</li>
+        <li>Email User</li>
+        <li>Activity Log</li>
+        <li>Clinics</li>
+        <li>Delete</li>
+      </ul>
+    </div>
+  </CellWithMenu>
+);
+
+export const Label = styled.div`
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  margin-right: 10px;
+  border-radius: 2px;
+  color: white;
+  background: ${({ color }) => (color ? color : '#ccc')};
 `;

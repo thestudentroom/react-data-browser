@@ -9,54 +9,111 @@ import {
   TableHead,
   HeadRowItem,
   TableBody,
-  TableRow,
-  TableRowItem,
+  Row,
+  RowItem,
 } from '../../__components__/table';
 import { BaseTable } from '../base';
 import fieldReducer from './fieldReducer';
+import { Checkbox } from '../../__components__/formElements';
+import { HeadCell } from '../../__components__/table/components/HeadCell';
 
-function Demo({ onTableRowClick, onToggleSort }) {
+function Demo({
+  onTableRowClick,
+  onToggleSort,
+  onCheckboxToggle,
+  onSelectAll,
+  onDeselectAll,
+}) {
+  const fixedColWidth = 40;
   return (
-    <BaseTable onToggleSort={onToggleSort}>
+    <BaseTable
+      onToggleSort={onToggleSort}
+      onCheckboxToggle={onCheckboxToggle}
+      onSelectAll={onSelectAll}
+      onDeselectAll={onDeselectAll}
+    >
       {(
         data,
-        { columnFlex, visibleColumns, defaultSortMethod, toggleSort },
-      ) => (
-        <View>
-          <TableHead>
-            {visibleColumns.map((cell, index) => (
-              <HeadRowItem
-                key={index}
-                selected={cell}
-                flex={columnFlex[index]}
-                onClick={() => toggleSort({ sortField: cell.sortField })}
-              >
-                {cell.label}
-              </HeadRowItem>
-            ))}
-          </TableHead>
-          <TableBody>
-            {sort(defaultSortMethod, data).map((row, key) => (
-              <TableRow key={key} selectable>
-                {visibleColumns.map(({ sortField, isLocked }, index) => (
-                  <TableRowItem
-                    key={sortField}
-                    flex={columnFlex[index]}
-                    cursor="pointer"
-                    onClick={() => onTableRowClick(`row id ${row.id}`)}
-                  >
-                    {isLocked && `🔒 `}
-                    {fieldReducer(
-                      getObjectPropertyByString(row, sortField),
-                      sortField,
-                    )}
-                  </TableRowItem>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </View>
-      )}
+        {
+          columnFlex,
+          visibleColumns,
+          defaultSortMethod,
+          toggleSort,
+          checkboxState,
+          checkboxToggle,
+          selectAllCheckboxState,
+          onSelection,
+        },
+      ) => {
+        return (
+          <View>
+            {/* HEAD */}
+            <TableHead>
+              {/* Head Columns */}
+              <HeadCell
+                flex="0 0 auto"
+                selected
+                style={{
+                  position: 'relative',
+                  width: fixedColWidth,
+                }}
+                render={() => (
+                  <Checkbox
+                    selectAllCheckboxState={selectAllCheckboxState}
+                    disabled={false}
+                    onChange={() => {
+                      onSelection({
+                        items: data.map(row => row.id),
+                      });
+                    }}
+                  />
+                )}
+              />
+              {visibleColumns.map((cell, index) => (
+                <HeadRowItem
+                  key={index}
+                  selected={cell}
+                  flex={columnFlex[index]}
+                  onClick={() => toggleSort({ sortField: cell.sortField })}
+                >
+                  {cell.label}
+                </HeadRowItem>
+              ))}
+            </TableHead>
+            {/* BODY */}
+            <TableBody>
+              {sort(defaultSortMethod, data).map((row, key) => (
+                <Row key={key} selectable>
+                  <RowItem style={{ width: fixedColWidth }} flex="0 0 auto">
+                    <Checkbox
+                      id={row.id}
+                      checked={checkboxState(row.id)}
+                      onChange={() => {
+                        checkboxToggle({ rowId: row.id });
+                      }}
+                    />
+                  </RowItem>
+                  {visibleColumns.map(
+                    ({ label, sortField, isLocked }, index) => (
+                      <RowItem
+                        key={sortField}
+                        flex={columnFlex[index]}
+                        checked={checkboxState(row.id)}
+                        onClick={() => onTableRowClick(`row id ${row.id}`)}
+                      >
+                        {fieldReducer(
+                          getObjectPropertyByString(row, sortField),
+                          sortField,
+                        )}
+                      </RowItem>
+                    ),
+                  )}
+                </Row>
+              ))}
+            </TableBody>
+          </View>
+        );
+      }}
     </BaseTable>
   );
 }
@@ -65,6 +122,9 @@ storiesOf('features', module)
   .add('Docs', () => <ShowDocs md={require('../../../docs/sample.md')} />)
   .add('Demo', () => (
     <Demo
+      onSelectAll={action('onSelectAll')}
+      onDeselectAll={action('onDeselectAll')}
+      onCheckboxToggle={action('onCheckboxToggle')}
       onTableRowClick={action('onTableRowClick')}
       onToggleSort={action('onToggleSort')}
     />

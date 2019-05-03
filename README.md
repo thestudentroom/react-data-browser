@@ -8,7 +8,7 @@
 [![Build Status][build-badge]][build]
 [![Code Coverage][coverage-badge]][coverage]
 [![MIT License][license-badge]][license]
-[![PRs Welcome][prs-badge]][prs] 
+[![PRs Welcome][prs-badge]][prs]
 [![Code of Conduct][coc-badge]][coc]
 [![size][size-badge]][unpkg-dist] [![gzip size][gzip-badge]][unpkg-dist]
 [![Storybook](https://github.com/storybooks/press/blob/master/badges/storybook.svg)](https://davidalekna.github.io/react-data-browser)
@@ -19,7 +19,7 @@ It's time consuming to build your own table functionality when you want somethin
 
 ## This solution
 
-DataBrowser component will provide common functionalities like checkbox, client side sorting, filtering, visible / offset columns and much more for your individual table components... 
+DataBrowser component will provide common functionalities like checkbox, client side sorting, filtering, visible / offset columns and much more for your individual table components...
 
 > NOTE: The original use case of this component is to build flexbox tables, however the API
 > is powerful and flexible enough to build things like grids as well.
@@ -28,7 +28,6 @@ DataBrowser component will provide common functionalities like checkbox, client 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -46,7 +45,7 @@ DataBrowser component will provide common functionalities like checkbox, client 
   - [viewType](#viewtype)
   - [selectAllCheckboxState](#selectallcheckboxstate)
   - [currentSort](#currentsort)
-  - [checked](#checked)
+  - [checkedItems](#checkedItems)
   - [viewsAvailable](#viewsavailable-1)
   - [switchViewType](#switchviewtype)
   - [switchColumns](#switchcolumns)
@@ -83,18 +82,14 @@ npm install --save react-data-browser
 > [Try it out in the browser](https://codesandbox.io/s/github/davidalekna/data-browser-examples)
 
 ```jsx
-import React from 'react'
-import {render} from 'react-dom'
-import DataBrowser from 'react-data-browser'
+import React from 'react';
+import { render } from 'react-dom';
+import DataBrowser from 'react-data-browser';
 
 render(
-  <DataBrowser columns={[]}>
-    {() => (
-      <div />
-    )}
-  </DataBrowser>,
+  <DataBrowser columns={[]}>{() => <div />}</DataBrowser>,
   document.getElementById('root'),
-)
+);
 ```
 
 This package exposes `<DataBrowser />`, `withDataBrowser()` components and `getObjectPropertyByString()` function.
@@ -102,7 +97,7 @@ This package exposes `<DataBrowser />`, `withDataBrowser()` components and `getO
 `<DataBrowser />` doesn't render anything itself, it just calls the render function and renders that ["Use a render prop!"][use-a-render-prop]!
 `<DataBrowser>{props => <div>/* your JSX here! */</div>}</DataBrowser>`.
 
-`getObjectPropertyByString()` is a function that helps to access nested properties on an object by string. 
+`getObjectPropertyByString()` is a function that helps to access nested properties on an object by string.
 Usage: `getObjectPropertyByString(object, 'object.property.that.you.want.to.access')`
 
 ## Basic Props
@@ -129,7 +124,7 @@ sets an initial sort order.
 
 Accepts an array of objects with any values you need + 3 values that are used by the component.
 label key will hold the label for the field, sortField will have to match data key name that you want
-to display from remote source. isLocked key will add isLocked props to the visibleColumns. 
+to display from remote source. isLocked key will add isLocked props to the visibleColumns.
 
 ### viewsAvailable
 
@@ -147,7 +142,7 @@ totalItems is required if you have a sorting functionality on your table. It wil
 
 > `Array<string>` | optional
 
-Takes in an array of ids if you need to set initial checked items.
+Takes in an array of ids if you need to set initial checkedItems items.
 
 ### initialColumnFlex
 
@@ -177,12 +172,12 @@ state that will be set, and you return the state that you want to set.
 ```jsx
 const ui = (
   <DataBrowser stateReducer={stateReducer}>{/* your callback */}</DataBrowser>
-)
+);
 
 function stateReducer(state, changes) {
   switch (changes.type) {
     default:
-      return changes
+      return changes;
   }
 }
 ```
@@ -205,7 +200,7 @@ function stateReducer(state, changes) {
 
 > `object` | defaults to currentSort: { dir: '', sortField: '' }
 
-### checked
+### checkedItems
 
 > `Array<>` | control prop
 
@@ -231,7 +226,7 @@ will accept an object with params from and to. Providing sortFields columns will
 
 > `function(props: string)` | defaults to internal implementation
 
-will check weather item is checked or not. Returns boolean
+will check weather item is checkedItems or not. Returns boolean
 
 ### offsetColumns
 
@@ -243,13 +238,13 @@ will return offset columns with additional prop 'visible' if that column is alre
 
 > `function(props: string)` | defaults to internal implementation
 
-will accept item id and toggle the checkbox for that item 
+will accept item id and toggle the checkbox for that item
 
 ### onSelection
 
 > `function(props: object)` | defaults to internal implementation
 
-function for 'select all checkbox'. 
+function for 'select all checkbox'.
 
 ### toggleSort
 
@@ -282,7 +277,7 @@ will accept sortField and dir
 
 This function is called anytime the internal state changes. This can be useful
 if you're using react-data-browser as a "controlled" component, where you manage some or
-all of the state and then pass it as props, rather than letting react-data-browser control 
+all of the state and then pass it as props, rather than letting react-data-browser control
 all its state itself. The parameters both take the shape of internal state but differ slightly.
 
 - `changes`: These are the properties that actually have changed since the last
@@ -297,16 +292,18 @@ all its state itself. The parameters both take the shape of internal state but d
 
 ```jsx
 class App extends React.Component {
-  state = { rows: [] }
+  state = { rows: [] };
   onStateChange = (action, { defaultSortMethod }) => {
-    if (action.type === "__sort_data__") {
+    if (action.type === '__sort_data__') {
       this.setState(state => ({
-        rows: sort(defaultSortMethod, state.rows)
+        rows: sort(defaultSortMethod, state.rows),
       }));
     }
-  }
+  };
   render() {
-    <DataBrowser onStateChange={this.onStateChange}>{/* your callback */}</DataBrowser>
+    <DataBrowser onStateChange={this.onStateChange}>
+      {/* your callback */}
+    </DataBrowser>;
   }
 }
 ```
@@ -322,7 +319,7 @@ why state is being changed. To accomplish this, there's a `type` property on the
 are available, run this in your app:
 
 ```javascript
-console.log(Object.keys(DataBrowser.stateChangeTypes))
+console.log(Object.keys(DataBrowser.stateChangeTypes));
 ```
 
 ## Children Function
@@ -332,12 +329,8 @@ You use it like so:
 
 ```javascript
 const ui = (
-  <DataBrowser>
-    {props => (
-      <div>{/* more jsx here */}</div>
-    )}
-  </DataBrowser>
-)
+  <DataBrowser>{props => <div>{/* more jsx here */}</div>}</DataBrowser>
+);
 ```
 
 ## LICENSE

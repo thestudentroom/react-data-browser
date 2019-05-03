@@ -1,17 +1,17 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
-import hoistNonReactStatics from 'hoist-non-react-statics';
+import * as hoistNonReactStatics from 'hoist-non-react-statics';
 import { getObjectPropertyByString, arrayHasArrays } from './utils';
-import { State, Props } from './types';
+import { State, Props, CheckboxAllState } from './types';
 
 export const DataBrowserContext = React.createContext<State>({
   columnFlex: [],
   availableColumnFlex: null,
   visibleColumns: [],
   viewType: '',
-  selectAllCheckboxState: false,
+  selectAllCheckboxState: 'none',
   currentSort: {},
-  checked: [],
+  checkedItems: [],
   // fns
   getColumns: () => {},
   getViews: () => {},
@@ -164,25 +164,27 @@ export class DataBrowser extends React.Component<Props, State> {
    */
   onSelection = ({ type, items }: { type?: string; items?: string[] } = {}) => {
     switch (this.getState().selectAllCheckboxState) {
-      case true:
+      case 'all':
         return this.deselectAll({ type });
-      case false:
+      case 'some':
+        return this.deselectAll({ type });
+      case 'none':
         return this.selectAll({ type, items });
       default:
         return this.deselectAll({ type });
     }
   };
   /**
-   * deselectAll resets checkbox checked[] state to be empty
+   * deselectAll resets checkbox checkedItems[] state to be empty
    */
   deselectAll = ({ type = DataBrowser.stateChangeTypes.deselectAll } = {}) => {
     this.internalSetState(
-      { type, selectAllCheckboxState: false, checked: [] },
-      () => this.props.onDeselectAll(this.getState().checked),
+      { type, selectAllCheckboxState: 'none', checkedItems: [] },
+      () => this.props.onDeselectAll(this.getState().checkedItems),
     );
   };
   /**
-   * selectAll checkbox to pull all ids into checked[] state
+   * selectAll checkbox to pull all ids into checkedItems[] state
    */
   selectAll = ({
     type = DataBrowser.stateChangeTypes.selectAll,
@@ -191,10 +193,10 @@ export class DataBrowser extends React.Component<Props, State> {
     this.internalSetState(
       {
         type,
-        selectAllCheckboxState: true,
-        checked: items,
+        selectAllCheckboxState: 'all',
+        checkedItems: items,
       },
-      () => this.props.onSelectAll(this.getState().checked),
+      () => this.props.onSelectAll(this.getState().checkedItems),
     );
   };
   /**
@@ -204,39 +206,43 @@ export class DataBrowser extends React.Component<Props, State> {
     type = DataBrowser.stateChangeTypes.checkboxToggle,
     rowId = '',
   }: { type?: string; rowId?: string } = {}) => {
-    const checked = this.getState().checked;
-    if (checked) {
-      if (!checked.includes(rowId)) {
+    const checkedItems = this.getState().checkedItems;
+    if (checkedItems) {
+      if (!checkedItems.includes(rowId)) {
+        // checkedItems state does not include id
         this.internalSetState(
           state => ({
             type,
-            checked: [...state.checked, rowId],
+            checkedItems: [...state.checkedItems, rowId],
           }),
           () => {
             this.setState(state => {
-              if (state.checked) {
+              if (state.checkedItems) {
                 return {
                   selectAllCheckboxState:
-                    this.props.totalItems === state.checked.length
-                      ? true
-                      : false,
+                    this.props.totalItems === state.checkedItems.length
+                      ? 'all'
+                      : 'some',
                 };
               } else {
                 //  ???
-                return {};
+                return {
+                  selectAllCheckboxState: 'none',
+                };
               }
             });
-            this.props.onCheckboxToggle(checked);
+            this.props.onCheckboxToggle(checkedItems);
           },
         );
       } else {
+        // checkedItems state includes id
         this.internalSetState(
           state => ({
             type,
-            selectAllCheckboxState: false,
-            checked: state.checked.filter(id => id !== rowId),
+            selectAllCheckboxState: 'some',
+            checkedItems: state.checkedItems.filter(id => id !== rowId),
           }),
-          () => this.props.onCheckboxToggle(checked),
+          () => this.props.onCheckboxToggle(checkedItems),
         );
       }
     }
@@ -245,10 +251,9 @@ export class DataBrowser extends React.Component<Props, State> {
    * checkboxState helps to determin current checkbox check state
    */
   checkboxState = value => {
-    const checked = this.getState().checked;
-    if (checked) {
-      checked.includes(value);
-    }
+    const checkedItems = this.getState().checkedItems;
+    if (!checkedItems) return false;
+    return checkedItems.includes(value);
   };
   /**
    * switchViewType triggers view switch (grid or list or others). To be improved...
@@ -384,9 +389,9 @@ export class DataBrowser extends React.Component<Props, State> {
       this._columnFlexInitializer().length,
     ),
     viewType: 'LIST_VIEW',
-    selectAllCheckboxState: false,
+    selectAllCheckboxState: 'none',
     currentSort: this.props.initialSort,
-    checked: this.props.initialChecked,
+    checkedItems: this.props.initialChecked,
     // fns
     getColumns: () => this.props.columns,
     getViews: () => this.props.viewsAvailable,
