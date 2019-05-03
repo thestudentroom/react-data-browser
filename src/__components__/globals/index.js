@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { ThemeProvider } from 'styled-components';
+import styled from 'styled-components';
 import {
   space,
   width,
@@ -39,19 +39,13 @@ export const FlexCol = styled.div`
 `;
 
 const RootView = styled(FlexCol)`
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
-    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family: ${({ theme }) => theme.fonts.sansSerif};
   position: relative;
-  overflow: none;
-  width: 100%;
-  height: 100%;
+  overflow-y: auto;
+  width: 100vw;
 `;
 
-export const View = ({ children }) => (
-  <ThemeProvider theme={{}}>
-    <RootView>{children}</RootView>
-  </ThemeProvider>
-);
+export const View = ({ children }) => <RootView>{children}</RootView>;
 
 const RootGrid = styled.section`
   display: grid;

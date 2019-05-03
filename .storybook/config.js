@@ -1,4 +1,8 @@
-import { configure } from '@storybook/react';
+import React from 'react';
+import { configure, addDecorator } from '@storybook/react';
+import { ThemeProvider } from 'styled-components';
+import GlobalStyle from './reset.css';
+import theme from './theme';
 
 const req = require.context(
   '../src/__stories__/',
@@ -9,5 +13,14 @@ const req = require.context(
 const loadStories = () => {
   req.keys().forEach(filename => req(filename));
 };
+
+addDecorator(story => (
+  <ThemeProvider theme={theme}>
+    <>
+      <GlobalStyle />
+      {story()}
+    </>
+  </ThemeProvider>
+));
 
 configure(loadStories, module);

@@ -2,36 +2,26 @@ import * as React from 'react';
 import { sort } from 'ramda';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import ShowDocs from '../../../utils/ShowDocs';
-import DataBrowser, { getObjectPropertyByString } from '../../../index';
-import fieldReducer from './fieldReducer';
-import { View } from '../../components/globals';
-import useData from '../../hooks/useData';
+import ShowDocs from '../../utils/ShowDocs';
+import { getObjectPropertyByString } from '../../index';
+import { View } from '../../__components__/globals';
 import {
   TableHead,
   HeadRowItem,
   TableBody,
   TableRow,
   TableRowItem,
-} from '../../components/table';
-
-const columns = [
-  { label: 'name', sortField: 'name', isLocked: true },
-  { label: 'user name', sortField: 'username' },
-  { label: 'email', sortField: 'email' },
-  { label: 'street', sortField: 'address.street' },
-];
+} from '../../__components__/table';
+import { BaseTable } from '../base';
+import fieldReducer from './fieldReducer';
 
 function Demo({ onTableRowClick, onToggleSort }) {
-  const { data } = useData();
   return (
-    <DataBrowser
-      columns={columns}
-      totalItems={data.length}
-      // on trigger log
-      onToggleSort={field => onToggleSort(`${field.sortField}-${field.dir}`)}
-    >
-      {({ columnFlex, visibleColumns, defaultSortMethod, toggleSort }) => (
+    <BaseTable onToggleSort={onToggleSort}>
+      {(
+        data,
+        { columnFlex, visibleColumns, defaultSortMethod, toggleSort },
+      ) => (
         <View>
           <TableHead>
             {visibleColumns.map((cell, index) => (
@@ -67,12 +57,12 @@ function Demo({ onTableRowClick, onToggleSort }) {
           </TableBody>
         </View>
       )}
-    </DataBrowser>
+    </BaseTable>
   );
 }
 
-storiesOf('column replace', module)
-  .add('Docs', () => <ShowDocs md={require('../../../../docs/sample.md')} />)
+storiesOf('sort', module)
+  .add('Docs', () => <ShowDocs md={require('../../../docs/sample.md')} />)
   .add('Demo', () => (
     <Demo
       onTableRowClick={action('onTableRowClick')}
