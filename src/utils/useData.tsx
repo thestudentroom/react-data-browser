@@ -2,7 +2,7 @@ import * as React from 'react';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://jsonplaceholder.typicode.com/',
+  baseURL: 'https://api.punkapi.com/v2/beers/',
 });
 
 export default function useData() {
@@ -10,14 +10,8 @@ export default function useData() {
   const [loading, setLoading] = React.useState(true);
 
   async function fetchRows() {
-    const [users, albums] = await Promise.all([
-      api('users'),
-      api('photos?albumId=1'),
-    ]);
-    const data = users.data.map(user => ({
-      ...user,
-      album: albums.data.find(album => album.id === user.id),
-    }));
+    const [{ data }] = await Promise.all([api('')]);
+    console.log(data);
     setRows(data);
     setLoading(false);
   }

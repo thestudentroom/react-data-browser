@@ -3,8 +3,10 @@ import { withDataBrowser } from '../../../index';
 import { HeadCellMenuPopup, CellWithMenu } from '../styles';
 import { pipe } from 'ramda';
 
+// onClick={() => toggleSort({ sortField: cell.sortField })}
+
 const HeadCellMenu = ({ dataBrowser, selected, toggleMenu, activeLabel }) => {
-  const sortField = `node.${selected.sortField}`;
+  const sortField = `${selected.sortField}`;
   const showFieldsMenu =
     !selected.isLocked &&
     dataBrowser.offsetColumns().length > 0 &&

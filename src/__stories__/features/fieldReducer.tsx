@@ -1,17 +1,17 @@
-import * as React from 'react';
-
-// field reducer pattern will help to modify each row item the way you want.
+// import * as React from 'react';
 
 function fieldReducer(fieldValue: any = '🍔', fieldName: string) {
   switch (fieldName) {
-    case 'name':
-      return `🌄 ${fieldValue}`;
-    case 'username':
-      return `📝 ${fieldValue}`;
-    case 'email':
-      return (
-        <div style={{ color: 'orange', fontStyle: 'italic' }}>{fieldValue}</div>
-      );
+    case 'boil_volume':
+      return 'TODO';
+    case 'food_pairing':
+      return 'TODO';
+    case 'ingredients':
+      return 'TODO';
+    case 'method':
+      return 'TODO';
+    case 'volume':
+      return 'TODO';
     default:
       return fieldValue;
   }

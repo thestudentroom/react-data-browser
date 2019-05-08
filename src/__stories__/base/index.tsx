@@ -3,10 +3,27 @@ import DataBrowser from '../../index';
 import useData from '../../utils/useData';
 
 const columns = [
-  { label: 'name', sortField: 'name', isLocked: true },
-  { label: 'user name', sortField: 'username' },
-  { label: 'email', sortField: 'email' },
-  { label: 'street', sortField: 'address.street' },
+  { label: 'abv', sortField: 'abv', isLocked: true },
+  { label: 'attenuation_level', sortField: 'attenuation_level' },
+  { label: 'boil_volume', sortField: 'boil_volume' },
+  { label: 'brewers_tips', sortField: 'brewers_tips' },
+  { label: 'contributed_by', sortField: 'contributed_by' },
+  { label: 'description', sortField: 'description' },
+  { label: 'ebc', sortField: 'ebc' },
+  { label: 'first_brewed', sortField: 'first_brewed' },
+  { label: 'food_pairing', sortField: 'food_pairing' },
+  { label: 'ibu', sortField: 'ibu' },
+  { label: 'id', sortField: 'id' },
+  { label: 'image_url', sortField: 'image_url' },
+  { label: 'ingredients', sortField: 'ingredients' },
+  { label: 'method', sortField: 'method' },
+  { label: 'name', sortField: 'name' },
+  { label: 'ph', sortField: 'ph' },
+  { label: 'srm', sortField: 'srm' },
+  { label: 'tagline', sortField: 'tagline' },
+  { label: 'target_fg', sortField: 'target_fg' },
+  { label: 'target_og', sortField: 'target_og' },
+  { label: 'volume', sortField: 'volume' },
 ];
 
 export function BaseTable({ children, onToggleSort, ...rest }) {

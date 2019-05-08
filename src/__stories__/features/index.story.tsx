@@ -23,6 +23,7 @@ function Demo({
   onCheckboxToggle,
   onSelectAll,
   onDeselectAll,
+  onSortData,
 }) {
   const fixedColWidth = 40;
   return (
@@ -31,6 +32,7 @@ function Demo({
       onCheckboxToggle={onCheckboxToggle}
       onSelectAll={onSelectAll}
       onDeselectAll={onDeselectAll}
+      onSortData={onSortData}
     >
       {(
         data,
@@ -70,14 +72,14 @@ function Demo({
                 )}
               />
               {visibleColumns.map((cell, index) => (
-                <HeadRowItem
+                <HeadCell
                   key={index}
                   selected={cell}
                   flex={columnFlex[index]}
-                  onClick={() => toggleSort({ sortField: cell.sortField })}
-                >
-                  {cell.label}
-                </HeadRowItem>
+                  style
+                  // onClick={() => toggleSort({ sortField: cell.sortField })}
+                  render={props => <div {...props}>{cell.label}</div>}
+                />
               ))}
             </TableHead>
             {/* BODY */}
@@ -127,5 +129,6 @@ storiesOf('features', module)
       onCheckboxToggle={action('onCheckboxToggle')}
       onTableRowClick={action('onTableRowClick')}
       onToggleSort={action('onToggleSort')}
+      onSortData={action('onSortData')}
     />
   ));
