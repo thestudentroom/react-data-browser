@@ -40,7 +40,8 @@
     "storybook:build": "build-storybook",
     "storybook:upload": "gh-pages -d storybook-static",
     "storybook:clean": "rimraf storybook-static",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "release": "semantic-release"
   },
   "dependencies": {
     "hoist-non-react-statics": "^3.0.1"
@@ -49,6 +50,9 @@
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.4",
     "@babel/plugin-proposal-logical-assignment-operators": "^7.2.0",
+    "@semantic-release/changelog": "^3.0.2",
+    "@semantic-release/git": "^7.0.8",
+    "@semantic-release/npm": "^5.1.7",
     "@storybook/addon-actions": "^5.0.11",
     "@storybook/addon-links": "^5.0.11",
     "@storybook/react": "^5.0.11",
@@ -74,16 +78,28 @@
     "react-dnd-html5-backend": "^7.4.4",
     "react-dom": "^16.8.1",
     "react-testing-library": "^7.0.0",
+    "semantic-release": "^15.13.12",
     "styled-components": "^4.2.0",
     "styled-system": "^4.2.2",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "ts-node": "^8.0.2",
-    "typescript": "^3.3.3",
-    "semantic-release": "^15.13.12"
+    "typescript": "^3.3.3"
   },
   "peerDependencies": {
     "prop-types": "^15.6.0",
     "react": "^16.8.1"
+  },
+  "release": {
+    "verifyConditions": [
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git"
+    ],
+    "prepare": [
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git"
+    ]
   }
 }
