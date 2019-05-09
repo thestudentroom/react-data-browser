@@ -1,23 +1,23 @@
 import 'react-testing-library/cleanup-after-each';
-import React from 'react';
+import * as React from 'react';
 import { render } from 'react-testing-library';
-import { getObjectPropertyByString } from '../utils';
 import DataBrowser from '../';
 import mockColumns from '../__mocks__/columns';
-import mockData from '../__mocks__/data';
 
 test('should return visibleColumns in shape of columnFlex', () => {
-  const { columnFlex, visibleColumns } = setup({
-    initialColumnFlex: ['0 0 25%', '1 1 55%', '0 0 20%'],
+  const { columnFlex, visibleColumns } = renderDataBrowser({
+    props: { initialColumnFlex: ['0 0 25%', '1 1 55%', '0 0 20%'] },
   });
   expect(visibleColumns.length).toEqual(columnFlex.length);
 });
 
 test('switchViewType should switch to selected available view', () => {
   const handleStateChange = jest.fn();
-  const { switchViewType } = setup({
-    onStateChange: handleStateChange,
-    viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
+  const { switchViewType } = renderDataBrowser({
+    props: {
+      onStateChange: handleStateChange,
+      viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
+    },
   });
   const viewType = { viewType: 'GRID_VIEW' };
   switchViewType(viewType);
@@ -34,7 +34,9 @@ test('switchViewType should switch to selected available view', () => {
 
 test('switchColumns should switch column accordingly', () => {
   const handleStateChange = jest.fn();
-  const { switchColumns } = setup({ onStateChange: handleStateChange });
+  const { switchColumns } = renderDataBrowser({
+    props: { onStateChange: handleStateChange },
+  });
   switchColumns({ from: 'name', to: 'body' });
   const changes = {
     type: DataBrowser.stateChangeTypes.switchColumns,
@@ -59,9 +61,15 @@ test('replaceColumnFlex should replace columns with chosen set of cols', () => {
     ['0 0 25%', '1 1 55%', '0 0 20%'],
     ['0 0 20%', '1 1 40%', '0 0 20%', '0 0 20%'],
   ];
-  const { columnFlex, availableColumnFlex, replaceColumnFlex } = setup({
-    initialColumnFlex: initialColumnFlex,
-    onStateChange: handleStateChange,
+  const {
+    columnFlex,
+    availableColumnFlex,
+    replaceColumnFlex,
+  } = renderDataBrowser({
+    props: {
+      initialColumnFlex: initialColumnFlex,
+      onStateChange: handleStateChange,
+    },
   });
 
   const selectedColFlex = availableColumnFlex[1];
@@ -89,8 +97,8 @@ test('replaceColumnFlex should replace columns with chosen set of cols', () => {
 });
 
 test('checkboxState should check if checbox on or off', () => {
-  const { checkboxState } = setup({
-    checked: [1, 2, 3, 4],
+  const { checkboxState } = renderDataBrowser({
+    props: { checkedItems: [1, 2, 3, 4] },
   });
   const result_1 = checkboxState(2);
   expect(result_1).toBeTruthy();
@@ -107,7 +115,7 @@ test('checkboxState should check if checbox on or off', () => {
 });
 
 test('offsetColumns should get all columns except with isLocked prop', () => {
-  const { offsetColumns } = setup();
+  const { offsetColumns } = renderDataBrowser();
   const columns = offsetColumns();
   const result = columns
     .map(item => (item.isLocked && 'exist') || false)
@@ -116,7 +124,7 @@ test('offsetColumns should get all columns except with isLocked prop', () => {
 });
 
 test('offsetColumns objects should contain prop visible', () => {
-  const { offsetColumns } = setup();
+  const { offsetColumns } = renderDataBrowser();
   const columns = offsetColumns();
   const result = columns
     .map(item => Object.keys(item).includes('visible'))
@@ -126,77 +134,85 @@ test('offsetColumns objects should contain prop visible', () => {
 
 test('checkboxToggle select when unchecked', () => {
   const handleStateChange = jest.fn();
-  const { checkboxToggle } = setup({
-    initialChecked: [0, 1, 2, 3, 4],
-    totalItems: 6,
-    onStateChange: handleStateChange,
+  const { checkboxToggle } = renderDataBrowser({
+    props: {
+      initialChecked: [0, 1, 2, 3, 4],
+      totalItems: 6,
+      onStateChange: handleStateChange,
+    },
   });
   checkboxToggle({ rowId: 5 });
   const changes = {
     type: DataBrowser.stateChangeTypes.checkboxToggle,
-    checked: [0, 1, 2, 3, 4, 5],
+    checkedItems: [0, 1, 2, 3, 4, 5],
   };
   expect(handleStateChange).toHaveBeenCalledTimes(1);
   expect(handleStateChange).toHaveBeenLastCalledWith(
     changes,
-    expect.objectContaining({ checked: [0, 1, 2, 3, 4, 5] }),
+    expect.objectContaining({ checkedItems: [0, 1, 2, 3, 4, 5] }),
   );
 });
 
-test('checkboxToggle select when checked', () => {
+test('checkboxToggle select when checkedItems', () => {
   const handleStateChange = jest.fn();
-  const { checkboxToggle } = setup({
-    initialChecked: [0, 1, 2, 3, 4, 5],
-    totalItems: 6,
-    onStateChange: handleStateChange,
+  const { checkboxToggle } = renderDataBrowser({
+    props: {
+      initialChecked: [0, 1, 2, 3, 4, 5],
+      totalItems: 6,
+      onStateChange: handleStateChange,
+    },
   });
   checkboxToggle({ rowId: 5 });
   const changes = {
     type: DataBrowser.stateChangeTypes.checkboxToggle,
-    selectAllCheckboxState: false,
-    checked: [0, 1, 2, 3, 4],
+    selectAllCheckboxState: 'some',
+    checkedItems: [0, 1, 2, 3, 4],
   };
   expect(handleStateChange).toHaveBeenCalledTimes(1);
   expect(handleStateChange).toHaveBeenLastCalledWith(
     changes,
-    expect.objectContaining({ checked: changes.checked }),
+    expect.objectContaining({ checkedItems: changes.checkedItems }),
   );
 });
 
 test('onSelection selectAllCheckboxState toggle', () => {
   const handleStateChange = jest.fn();
-  const { onSelection } = setup({
-    totalItems: 6,
-    onStateChange: handleStateChange,
+  const { onSelection } = renderDataBrowser({
+    props: {
+      totalItems: 6,
+      onStateChange: handleStateChange,
+    },
   });
   onSelection({ items: [0, 1, 2, 3, 4, 5] });
   const changes = {
     type: DataBrowser.stateChangeTypes.selectAll,
-    selectAllCheckboxState: true,
-    checked: [0, 1, 2, 3, 4, 5],
+    selectAllCheckboxState: 'all',
+    checkedItems: [0, 1, 2, 3, 4, 5],
   };
   expect(handleStateChange).toHaveBeenLastCalledWith(
     changes,
-    expect.objectContaining({ checked: changes.checked }),
+    expect.objectContaining({ checkedItems: changes.checkedItems }),
   );
   onSelection();
   const changes2 = {
     type: DataBrowser.stateChangeTypes.deselectAll,
-    selectAllCheckboxState: false,
-    checked: [],
+    selectAllCheckboxState: 'none',
+    checkedItems: [],
   };
   expect(handleStateChange).toHaveBeenCalledTimes(2);
   expect(handleStateChange).toHaveBeenLastCalledWith(
     changes2,
-    expect.objectContaining({ checked: [] }),
+    expect.objectContaining({ checkedItems: [] }),
   );
 });
 
 test('changeSortDirection', () => {
   const handleStateChange = jest.fn();
-  const { changeSortDirection } = setup({
-    initialSort: { dir: 'asc', sortField: '_id' },
-    onStateChange: handleStateChange,
+  const { changeSortDirection } = renderDataBrowser({
+    props: {
+      initialSort: { dir: 'asc', sortField: '_id' },
+      onStateChange: handleStateChange,
+    },
   });
   changeSortDirection({ dir: 'dsc' });
   const changes = {
@@ -217,11 +233,11 @@ test('defaultSortMethod', () => {});
 test('sortData', () => {});
 test('activeSort', () => {});
 
-function setup({
-  render: renderFn = () => <div />,
+function renderDataBrowser({
+  render: renderFn = args => <div />,
   columns = mockColumns,
-  ...props
-} = {}) {
+  props,
+}: any = {}): any {
   let renderArg;
   const childrenSpy = jest.fn(controllerArg => {
     renderArg = controllerArg;

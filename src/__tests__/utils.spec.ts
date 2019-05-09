@@ -16,8 +16,8 @@ test('should get object property value by string', () => {
 });
 
 test('should detect if array is multidimensional', () => {
-  const test1 = ['hello world', 1, undefined, null, true, false, []];
-  const test2 = [[], [], []];
+  const test1: any = ['hello world', 1, undefined, null, true, false, []];
+  const test2: any = [[], [], []];
   const test3 = ['this', 'one', 'will', 'have', 'no', 'arrays'];
 
   const result1 = arrayHasArrays(test1);
