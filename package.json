@@ -1,8 +1,13 @@
 {
   "name": "react-data-browser",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "DataBrowser is a lightweight, fast and extendable render props component",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
+  "author": "David Alekna <alekna@live.co.uk>",
+  "license": "MIT",
+  "files": [
+    "lib/"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/davidalekna/react-data-browser.git"
@@ -23,19 +28,19 @@
     "data grid",
     "react grid"
   ],
-  "author": "David Alekna <alekna@live.co.uk>",
-  "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf dist",
-    "build": "./node_modules/.bin/babel src --out-dir dist",
+    "dev": "yarn storybook",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "prepare": "npm run build",
-    "validate": "npm-run-all --parallel test build",
+    "build": "yarn rimraf lib && tsc",
+    "clean": "rimraf lib storybook-static",
     "report-coverage": "codecov",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "deploy-storybook": "storybook-to-ghpages"
+    "storybook": "start-storybook -p 6008",
+    "validate": "npm-run-all --parallel test build",
+    "storybook:build": "build-storybook",
+    "storybook:upload": "gh-pages -d storybook-static",
+    "storybook:clean": "rimraf storybook-static",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "hoist-non-react-statics": "^3.0.1"
@@ -74,13 +79,11 @@
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "ts-node": "^8.0.2",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3",
+    "semantic-release": "^15.13.12"
   },
   "peerDependencies": {
     "prop-types": "^15.6.0",
     "react": "^16.8.1"
-  },
-  "files": [
-    "dist"
-  ]
+  }
 }
