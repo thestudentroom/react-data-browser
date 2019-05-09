@@ -156,7 +156,7 @@ export class DataBrowser extends React.Component<Props, State> {
           }
         });
     } else {
-      return this.props.columns;
+      return [];
     }
   };
   /**

@@ -19,6 +19,7 @@ test('switchViewType should switch to selected available view', () => {
       viewsAvailable: ['LIST_VIEW', 'GRID_VIEW'],
     },
   });
+  // Includes view type
   const viewType = { viewType: 'GRID_VIEW' };
   switchViewType(viewType);
   const changes = {
@@ -114,6 +115,14 @@ test('checkboxState should check if checbox on or off', () => {
   expect(result_6).toBeFalsy();
 });
 
+test('checkboxState returns false if checkedItems not available', () => {
+  const { checkboxState } = renderDataBrowser({
+    props: { checkedItems: undefined },
+  });
+  const result = checkboxState(2);
+  expect(result).toBeFalsy();
+});
+
 test('offsetColumns should get all columns except with isLocked prop', () => {
   const { offsetColumns } = renderDataBrowser();
   const columns = offsetColumns();
@@ -130,6 +139,17 @@ test('offsetColumns objects should contain prop visible', () => {
     .map(item => Object.keys(item).includes('visible'))
     .includes(false);
   expect(result).toEqual(false);
+});
+
+test('offsetColumns state doesnt have visibleColumns', () => {
+  // NOTE: not sure if it should return an empty array 🤔
+  const { offsetColumns } = renderDataBrowser({
+    props: {
+      visibleColumns: null,
+    },
+  });
+  const columns = offsetColumns();
+  expect(columns).toEqual([]);
 });
 
 test('checkboxToggle select when unchecked', () => {
@@ -176,23 +196,28 @@ test('checkboxToggle select when checkedItems', () => {
 });
 
 test('onSelection selectAllCheckboxState toggle', () => {
+  const items = [0, 1, 2, 3, 4, 5];
   const handleStateChange = jest.fn();
   const { onSelection } = renderDataBrowser({
     props: {
-      totalItems: 6,
+      totalItems: items.length,
       onStateChange: handleStateChange,
     },
   });
-  onSelection({ items: [0, 1, 2, 3, 4, 5] });
+
+  // All selected
+  onSelection({ items });
   const changes = {
     type: DataBrowser.stateChangeTypes.selectAll,
     selectAllCheckboxState: 'all',
-    checkedItems: [0, 1, 2, 3, 4, 5],
+    checkedItems: items,
   };
   expect(handleStateChange).toHaveBeenLastCalledWith(
     changes,
     expect.objectContaining({ checkedItems: changes.checkedItems }),
   );
+
+  // None selected
   onSelection();
   const changes2 = {
     type: DataBrowser.stateChangeTypes.deselectAll,
@@ -202,8 +227,20 @@ test('onSelection selectAllCheckboxState toggle', () => {
   expect(handleStateChange).toHaveBeenCalledTimes(2);
   expect(handleStateChange).toHaveBeenLastCalledWith(
     changes2,
-    expect.objectContaining({ checkedItems: [] }),
+    expect.objectContaining({ checkedItems: changes2.checkedItems }),
   );
+
+  // Some selected
+  // onSelection({ items: [1, 2, 3] });
+  // const changes3 = {
+  //   type: DataBrowser.stateChangeTypes.deselectAll,
+  //   selectAllCheckboxState: 'some',
+  //   checkedItems: [1, 2, 3],
+  // };
+  // expect(handleStateChange).toHaveBeenLastCalledWith(
+  //   changes3,
+  //   expect.objectContaining({ checkedItems: changes3.checkedItems }),
+  // );
 });
 
 test('changeSortDirection', () => {
