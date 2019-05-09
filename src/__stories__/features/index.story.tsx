@@ -106,6 +106,7 @@ function Demo({
                         {fieldReducer(
                           getObjectPropertyByString(row, sortField),
                           sortField,
+                          row,
                         )}
                       </RowItem>
                     ),
