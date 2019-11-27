@@ -111,5 +111,8 @@
       "@semantic-release/npm",
       "@semantic-release/git"
     ]
-  }
+  },
+  "files": [
+    "./lib"
+  ]
 }
