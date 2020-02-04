@@ -45,7 +45,7 @@
     "release": "semantic-release"
   },
   "dependencies": {
-    "core-js": "^3",
+    "core-js": "^3.6.4",
     "hoist-non-react-statics": "^3.0.1"
   },
   "devDependencies": {
