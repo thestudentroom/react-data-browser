@@ -7,8 +7,7 @@
   "main": "lib/index.js",
   "module": "esm/index.js",
   "files": [
-    "lib/",
-    "esm/"
+    "./lib"
   ],
   "repository": {
     "type": "git",
@@ -46,6 +45,7 @@
     "release": "semantic-release"
   },
   "dependencies": {
+    "core-js": "^3",
     "hoist-non-react-statics": "^3.0.1"
   },
   "devDependencies": {
@@ -111,8 +111,5 @@
       "@semantic-release/npm",
       "@semantic-release/git"
     ]
-  },
-  "files": [
-    "./lib"
-  ]
+  }
 }
